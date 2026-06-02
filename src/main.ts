@@ -19,7 +19,6 @@ async function main() {
     window.addEventListener('keydown', e => keys.add(e.key.toLowerCase()));
     window.addEventListener('keyup', e => keys.delete(e.key.toLowerCase()));
 
-    // Pointer lock for first-person look
     canvas.addEventListener('click', () => canvas.requestPointerLock());
     const ui = document.getElementById('ui')!;
     document.addEventListener('pointerlockchange', () => {
@@ -33,10 +32,11 @@ async function main() {
     document.addEventListener('mousemove', e => {
         if (document.pointerLockElement === canvas) {
             yaw -= e.movementX * 0.002;
-            pitch -= e.movementY * 0.002;
+            // invert pitch since moving mouse down should look down
+            pitch -= e.movementY * -0.002;
             
-            // Clamp pitch to not flip over
-            pitch = Math.max(-Math.PI/2 + 0.01, Math.min(Math.PI/2 - 0.01, pitch));
+            // clamp pitch to not flip over (that would be awkward)
+            pitch = Math.max(-Math.PI/2 + 0.01, Math.min(Math.PI/2 - 0.01, pitch)); // max is slightly less than 90 degrees
         }
     });
 
@@ -47,6 +47,7 @@ async function main() {
     });
 
     // Scene data
+    // @TODO: WILL BE EDITED
     const boxes = [
         { pos: [0, 0.5, 0] as Vec3, scale: [1, 1, 1] as Vec3 },
         { pos: [2, 1, -2] as Vec3, scale: [2, 2, 2] as Vec3 },
@@ -70,8 +71,8 @@ async function main() {
             0,
             -Math.sin(yaw)
         ];
+        const down: Vec3 = Vec3.cross(right, forward);
 
-        // Restrict movement to the XZ plane for standard walking
         let moveForward: Vec3 = [forward[0], 0, forward[2]];
         if (moveForward[0] !== 0 || moveForward[2] !== 0) {
             moveForward = Vec3.normalize(moveForward);
@@ -82,6 +83,8 @@ async function main() {
         if (keys.has('s')) camPos = Vec3.add(camPos, Vec3.mul(moveForward, dt * speed));
         if (keys.has('a')) camPos = Vec3.sub(camPos, Vec3.mul(right, dt * speed));
         if (keys.has('d')) camPos = Vec3.add(camPos, Vec3.mul(right, dt * speed));
+        if (keys.has(' ')) camPos = Vec3.sub(camPos, Vec3.mul(down, dt * speed));
+        if (keys.has('shift')) camPos = Vec3.add(camPos, Vec3.mul(down, dt * speed));
 
         // Calculate matrices
         const target = Vec3.sub(camPos, forward);
