@@ -1,0 +1,31 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+  font-family: sans-serif;
+}
+#game-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+#ui {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  pointer-events: none;
+  background: rgba(0,0,0,0.7);
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 24px;
+}
+#ui small {
+  font-size: 16px;
+  color: #ccc;
+}
