@@ -37,103 +37,125 @@ async function main() {
     });
     portalTarget = engine.createRenderTarget(canvas.width, canvas.height);
 
-    // --- PORTAL DATA STRUCTURE ---
-    // Portal A is in your starting room. Portal B is far away in the tunnel.
-    // They both face the +Z direction (parallel portals).
-    const portalA = { pos: [0, 1.5, -2] as Vec3, normal: [0, 0, 1] as Vec3 };
-    const portalB = { pos: [50, 1.5, 50] as Vec3, normal: [0, 0, 1] as Vec3 };
-
-    const boxes = [
-        // Room A (Main)
-        { pos: [0, -0.5, 0] as Vec3, scale: [10, 1, 10] as Vec3, mult: [0.2, 0.2, 0.8, 1] }, // Floor
-        { pos: [-3, 1, 0] as Vec3, scale: [1, 2, 1] as Vec3, mult: [1, 1, 1, 1] },
-        { pos: [3, 1, 0] as Vec3, scale: [1, 2, 1] as Vec3, mult: [1, 1, 1, 1] },
-        
-        // Room B (The Distant Tunnel)
-        { pos: [50, -0.5, 45] as Vec3, scale: [4, 1, 30] as Vec3, mult: [0.8, 0.2, 0.2, 1] }, // Red Tunnel Floor
-        { pos: [51.5, 1, 45] as Vec3, scale: [1, 2, 30] as Vec3, mult: [0.4, 0.1, 0.1, 1] }, // Right Wall
-        { pos: [48.5, 1, 45] as Vec3, scale: [1, 2, 30] as Vec3, mult: [0.4, 0.1, 0.1, 1] }, // Left Wall
-        { pos: [50, 1, 30] as Vec3, scale: [4, 2, 1] as Vec3, mult: [0.2, 0.2, 0.2, 1] }, // Back Wall
+    // --- 1. GEOMETRY GENERATION (Space Duplication Trick) ---
+    const boxes: any[] = [];
+    
+    const worldGeometry = [
+        { pos: [0, -0.5, 10] as Vec3, scale: [50, 1, 50] as Vec3, mult: [0.2, 1, 0.2, 1] }, // Front Yard
+        { pos: [0, 1.5, -15] as Vec3, scale: [2, 4, 2] as Vec3, mult: [0.8, 0.8, 0.2, 1] }, // Yellow Pillar (Behind Tunnel)
+        { pos: [0, 1.5, 5] as Vec3, scale: [2, 4, 2] as Vec3, mult: [0.2, 0.2, 0.8, 1] }    // Blue Pillar (In Front)
     ];
 
-    let lastTime = performance.now();
+    const longExterior = [
+        { pos: [2.1, 1.5, -5] as Vec3, scale: [0.2, 3, 10] as Vec3, mult: [0.1, 0.1, 0.1, 1] }, // Right Outer
+        { pos: [-2.1, 1.5, -5] as Vec3, scale: [0.2, 3, 10] as Vec3, mult: [0.1, 0.1, 0.1, 1] }, // Left Outer
+        { pos: [0, 3.1, -5] as Vec3, scale: [4.4, 0.2, 10] as Vec3, mult: [0.1, 0.1, 0.1, 1] } // Roof Outer
+    ];
 
+    const shortInterior = [
+        { pos: [100, 3.3, -1.5] as Vec3, scale: [4, 1.2, 3] as Vec3, mult: [0.1, 0.1, 0.1, 1] }, // Floor
+        { pos: [101.9, 1, -1.5] as Vec3, scale: [0.2, 3.45, 3] as Vec3, mult: [0.1, 0.1, 0.1, 1] },  // Right Inner
+        { pos: [98.1, 1, -1.5] as Vec3, scale: [0.2, 3.45, 3] as Vec3, mult: [0.1, 0.1, 0.1, 1] },   // Left Inner
+    ];
+
+    // Build Room A (Main Universe)
+    worldGeometry.forEach(b => boxes.push({ ...b, room: 'A' }));
+    longExterior.forEach(b => boxes.push({ ...b, room: 'A' }));
+
+    let inRoomB = false; 
+
+    // Build Room B (Pocket Universe)
+    shortInterior.forEach(b => boxes.push({ ...b, room: 'B' }));
+    worldGeometry.forEach(b => boxes.push({
+        // The magic step: Duplicating the world but shifting it to close the physical gap
+        // Main tunnel is 10 units long. Short tunnel is 3 units long. Shift = 7 units.
+        pos: [b.pos[0] + 100, b.pos[1], inRoomB ? b.pos[2] + 7 : b.pos[2]],
+        scale: b.scale,
+        mult: b.mult,
+        room: 'B'
+    }));
+
+    let lastTime = performance.now();
+    
     function loop(time: number) {
         const dt = (time - lastTime) / 1000.0;
         lastTime = time;
-
         prevCamPos = [...camPos] as Vec3;
 
         const forward: Vec3 = [Math.cos(pitch) * Math.sin(yaw), Math.sin(pitch), Math.cos(pitch) * Math.cos(yaw)];
         const right: Vec3 = [Math.cos(yaw), 0, -Math.sin(yaw)];
-        
         let moveFwd: Vec3 = [forward[0], 0, forward[2]];
         if (moveFwd[0] !== 0 || moveFwd[2] !== 0) moveFwd = Vec3.normalize(moveFwd);
         
-        let speed = 5.0;
-        if (keys.has('w')) camPos = Vec3.sub(camPos, Vec3.mul(moveFwd, dt * speed));
-        if (keys.has('s')) camPos = Vec3.add(camPos, Vec3.mul(moveFwd, dt * speed));
-        if (keys.has('a')) camPos = Vec3.sub(camPos, Vec3.mul(right, dt * speed));
-        if (keys.has('d')) camPos = Vec3.add(camPos, Vec3.mul(right, dt * speed));
+        if (keys.has('w')) camPos = Vec3.sub(camPos, Vec3.mul(moveFwd, dt * 5));
+        if (keys.has('s')) camPos = Vec3.add(camPos, Vec3.mul(moveFwd, dt * 5));
+        if (keys.has('a')) camPos = Vec3.sub(camPos, Vec3.mul(right, dt * 5));
+        if (keys.has('d')) camPos = Vec3.add(camPos, Vec3.mul(right, dt * 5));
 
-        // --- 1. TELEPORTATION (Plane Crossing) ---
-        // Dot product checks if you are "in front" (>0) or "behind" (<0) the portal surface
-        const prevDistA = Vec3.dot(Vec3.sub(prevCamPos, portalA.pos), portalA.normal);
-        const currDistA = Vec3.dot(Vec3.sub(camPos, portalA.pos), portalA.normal);
-        
-        const prevDistB = Vec3.dot(Vec3.sub(prevCamPos, portalB.pos), portalB.normal);
-        const currDistB = Vec3.dot(Vec3.sub(camPos, portalB.pos), portalB.normal);
-
-        // If you cross Portal A front-to-back, teleport to Portal B
-        if (prevDistA > 0 && currDistA <= 0 && Math.abs(camPos[0] - portalA.pos[0]) < 1.5) {
-            const offset = Vec3.sub(camPos, portalA.pos);
-            camPos = Vec3.add(portalB.pos, offset);
+        // --- 2. Z-AXIS TELEPORTATION ---
+        if (!inRoomB) {
+            // Front Entrance (Walk into Z=0)
+            if (prevCamPos[2] > 0 && camPos[2] <= 0 && Math.abs(camPos[0]) < 2) {
+                camPos[0] += 100;
+                inRoomB = true;
+            }
+            // Back Entrance (Walk into Z=-10)
+            else if (prevCamPos[2] < -10 && camPos[2] >= -10 && Math.abs(camPos[0]) < 2) {
+                camPos[0] += 100;
+                camPos[2] += 7; // Physically skip the 7 unit difference
+                inRoomB = true;
+            }
+        } else {
+            // Front Exit (Walk out of Z=0)
+            if (prevCamPos[2] < 0 && camPos[2] >= 0 && Math.abs(camPos[0] - 100) < 2) {
+                camPos[0] -= 100;
+                inRoomB = false;
+            }
+            // Back Exit (Walk out of Z=-3)
+            else if (prevCamPos[2] > -3 && camPos[2] <= -3 && Math.abs(camPos[0] - 100) < 2) {
+                camPos[0] -= 100;
+                camPos[2] -= 7; // Restore the 7 units to place you at -10
+                inRoomB = false;
+            }
         }
-        // If you cross Portal B back-to-front, teleport to Portal A
-        else if (prevDistB <= 0 && currDistB > 0 && Math.abs(camPos[0] - portalB.pos[0]) < 1.5) {
-            const offset = Vec3.sub(camPos, portalB.pos);
-            camPos = Vec3.add(portalA.pos, offset);
-        }
 
-        // --- 2. VIRTUAL CAMERA MATH ---
-        // Find which room the player is in right now
-        const inRoomB = camPos[0] > 25;
-        const currentPortal = inRoomB ? portalB : portalA;
-        const targetPortal = inRoomB ? portalA : portalB;
+        // --- 3. DYNAMIC PORTAL TARGETING ---
+        // Determine if we should render the front entrance or the back exit
+        const distToFront = Math.abs(camPos[2] - 0);
+        const distToBack = Math.abs(camPos[2] - (inRoomB ? -3 : -3));
+        const isLookingAtFront = distToFront < distToBack;
 
-        // Offset relative to the entrance portal
-        const camOffset = Vec3.sub(camPos, currentPortal.pos);
-        // Apply offset to the destination portal
-        const virtualCamPos = Vec3.add(targetPortal.pos, camOffset);
+        const currentPortalA: Vec3 = isLookingAtFront ? [0, 1.5, 0] : [0, 1.5, -10];
+        const currentPortalB: Vec3 = isLookingAtFront ? [100, 1.5, 0] : [100, 1.5, -3];
+
+        const currentPortalPos = inRoomB ? currentPortalB : currentPortalA;
+        const targetPortalPos = inRoomB ? currentPortalA : currentPortalB;
+
+        const camOffset = Vec3.sub(camPos, currentPortalPos);
+        const virtualCamPos = Vec3.add(targetPortalPos, camOffset);
 
         const projMatrix = Mat4.perspective(Math.PI/3, canvas.width / canvas.height, 0.1, 100.0);
+        const mainView = Mat4.lookAt(camPos, Vec3.sub(camPos, forward), [0, 1, 0]);
+        const virtualView = Mat4.lookAt(virtualCamPos, Vec3.sub(virtualCamPos, forward), [0, 1, 0]);
+
+        // --- 4. RENDER FILTERING ---
+        const virtualModels = boxes
+            .filter(b => b.room === (inRoomB ? 'A' : 'B'))
+            .map(b => ({ model: Mat4.multiply(Mat4.translation(b.pos), Mat4.scaling(b.scale)), mult: b.mult }));
+
+        const mainModels = boxes
+            .filter(b => b.room === (inRoomB ? 'B' : 'A'))
+            .map(b => ({ model: Mat4.multiply(Mat4.translation(b.pos), Mat4.scaling(b.scale)), mult: b.mult }));
         
-        // Virtual View Matrix
-        const vTarget = Vec3.sub(virtualCamPos, forward);
-        const virtualViewMatrix = Mat4.lookAt(virtualCamPos, vTarget, [0, 1, 0]);
+        // Add active portal plane (Thickness 0.01 prevents Z-fighting)
+        mainModels.push({ 
+            model: Mat4.multiply(Mat4.translation(currentPortalPos), Mat4.scaling([4, 3, 0.01])), 
+            mult: [1, 1, 1, 1], 
+            isPortal: true 
+        } as any);
 
-        // Main View Matrix
-        const target = Vec3.sub(camPos, forward);
-        const mainViewMatrix = Mat4.lookAt(camPos, target, [0, 1, 0]);
-
-        // Build models array
-    const models: { model: Float32Array, mult: number[], isPortal?: boolean }[] = boxes.map(b => ({
-                model: Mat4.multiply(Mat4.translation(b.pos), Mat4.scaling(b.scale)),
-                mult: b.mult
-            }));
-
-        // 1. FLATTEN THE PORTAL TO 0.0 THICKNESS
-        // This crushes the 3D box into a perfectly flat 2D plane
-        const portalModel = Mat4.multiply(Mat4.translation(currentPortal.pos), Mat4.scaling([2, 3, 0.0]));
-        models.push({ model: portalModel, mult: [1, 1, 1, 1], isPortal: true });
-
-        // --- 3. RENDER PIPELINE ORDER ---
-        // 2. CHANGE 'null' TO 'undefined' 
-        // Pass 1: Render the scene from the Virtual Camera to the Offscreen Texture
-        engine.render(projMatrix, virtualViewMatrix, models, portalTarget!.view, undefined);
-
-        // Pass 2: Render the scene from the Main Camera to the Canvas, applying the texture
-        engine.render(projMatrix, mainViewMatrix, models, undefined, portalTarget!.view);
+        engine.render(projMatrix, virtualView, virtualModels, portalTarget!.view, undefined);
+        engine.render(projMatrix, mainView, mainModels, undefined, portalTarget!.view);
 
         requestAnimationFrame(loop);
     }

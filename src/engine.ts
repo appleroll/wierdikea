@@ -165,7 +165,7 @@ export class Engine {
         const pass = commandEncoder.beginRenderPass({
             colorAttachments: [{
                 view: targetView || this.context.getCurrentTexture().createView(),
-                clearValue: { r: 0.1, g: 0.1, b: 0.1, a: 1.0 },
+                clearValue: { r: 0.1, g: 0.5, b: 1, a: 1.0 },
                 loadOp: 'clear', storeOp: 'store'
             }],
             depthStencilAttachment: { view: this.depthTextureView, depthClearValue: 1.0, depthLoadOp: 'clear', depthStoreOp: 'store' }
