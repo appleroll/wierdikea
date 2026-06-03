@@ -1,4 +1,4 @@
-import { Mat4 } from './math';
+import { Mat4 } from '../math/Mat4';
 
 export class Engine {
     canvas: HTMLCanvasElement;
