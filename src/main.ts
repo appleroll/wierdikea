@@ -15,7 +15,6 @@ async function main() {
     const input = new InputManager(canvas);
     const camera = new Camera();
     
-    // 🔥 Instantiate our specific level
     const scene = buildWorld1();
 
     let portalTarget = engine.createRenderTarget(canvas.width, canvas.height);
