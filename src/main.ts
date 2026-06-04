@@ -35,6 +35,13 @@ async function main() {
 
         camera.update(dt, input);
         scene.updateTeleportation(camera);
+        if (camera.pos[2] < -10) {
+            console.log("moved to B")
+        } else if (camera.pos[2] > 0) {
+            console.log("moved to A")
+        } else {
+            console.log("in between")
+        }
 
         const { virtualModels, mainModels, virtualView } = scene.getRenderData(camera);
         const projMatrix = Mat4.perspective(Math.PI/3, canvas.width / canvas.height, 0.1, 100.0);
