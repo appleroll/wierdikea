@@ -66,7 +66,6 @@ export class Tunnel {
         scene.addBox({ pos: extRightPos, scale: extSideScale, mult: color, room: mainRoom });
         scene.addBox({ pos: extRoofPos, scale: extRoofScale, mult: color, room: mainRoom });
 
-        // --- 3. HOOK UP PORTALS ---
         if (init) {
             const entryPortal = new Portal(
                 mainRoom, startPos,
