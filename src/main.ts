@@ -5,7 +5,6 @@ import { Camera } from './world/Camera';
 import { buildWorld1 } from './world/world1';
 
 async function main() {
-    let currentLoopRoom = "A";
     const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -36,15 +35,6 @@ async function main() {
 
         camera.update(dt, input);
         scene.updateTeleportation(camera);
-        
-        if (camera.pos[2] < -10 && currentLoopRoom == "A") {
-            console.log("crossed into room B, rebuilding world")
-            currentLoopRoom = "B";
-        } else if (camera.pos[2] > 0 && currentLoopRoom == "B") {
-            console.log("crossed back into room A, rebuilding world")
-            currentLoopRoom = "A";
-        } 
-
 
         const { virtualModels, mainModels, virtualView } = scene.getRenderData(camera);
         const projMatrix = Mat4.perspective(Math.PI/3, canvas.width / canvas.height, 0.1, 100.0);

@@ -1,5 +1,5 @@
 import { Vec3 } from '../math/Vec3';
-import { Camera } from './Camera';
+import { Camera } from '../world/Camera';
 
 export class Portal {
     public roomA: string;

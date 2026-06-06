@@ -1,7 +1,7 @@
 import { Vec3 } from '../math/Vec3';
 import { Mat4 } from '../math/Mat4';
 import { Camera } from './Camera';
-import { Portal } from './Portal';
+import { Portal } from '../noneuclideans/Portal';
 
 export interface RenderBox {
     pos: Vec3;
