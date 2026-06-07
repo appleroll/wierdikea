@@ -17,14 +17,17 @@ async function main() {
     
     const scene = buildWorld1(true);
 
-    let portalTarget = engine.createRenderTarget(canvas.width, canvas.height);
+    // Keep an array of render targets instead of just one
+    let portalTargets: { texture: GPUTexture, view: GPUTextureView }[] = [];
 
     window.addEventListener('resize', () => {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         engine.resize(canvas.width, canvas.height);
-        portalTarget.texture.destroy();
-        portalTarget = engine.createRenderTarget(canvas.width, canvas.height);
+        
+        // Destroy old textures to prevent memory leaks
+        portalTargets.forEach(target => target.texture.destroy());
+        portalTargets = []; 
     });
 
     let lastTime = performance.now();
@@ -36,12 +39,28 @@ async function main() {
         camera.update(dt, input);
         scene.updateTeleportation(camera);
 
-        const { virtualModels, mainModels, virtualView } = scene.getRenderData(camera);
+        // NOTE: You will need to update Scene.ts to return an array of portalsData (see step 3 below)
+        const { portalsData, mainModels } = scene.getRenderData(camera) as any; 
+        
         const projMatrix = Mat4.perspective(Math.PI/3, canvas.width / canvas.height, 0.1, 100.0);
         const mainView = camera.getViewMatrix();
 
-        engine.render(projMatrix, virtualView, virtualModels, portalTarget.view, undefined);
-        engine.render(projMatrix, mainView, mainModels, undefined, portalTarget.view);
+        // Ensure we have enough physical texture targets for the active portals
+        while (portalTargets.length < portalsData.length) {
+            portalTargets.push(engine.createRenderTarget(canvas.width, canvas.height));
+        }
+
+        const activePortalViews: GPUTextureView[] = [];
+
+        // 1. Render each portal's view into its dedicated texture
+        portalsData.forEach((pData: any, index: number) => {
+            const target = portalTargets[index];
+            engine.render(projMatrix, pData.virtualView, pData.virtualModels, target.view, undefined);
+            activePortalViews.push(target.view);
+        });
+
+        // 2. Render the main room, passing ALL portal textures to the engine
+        engine.render(projMatrix, mainView, mainModels, undefined, activePortalViews);
 
         requestAnimationFrame(loop);
     }

@@ -34,49 +34,56 @@ export class Scene {
     }
 
     getRenderData(camera: Camera) {
-        let closestPortal: Portal | null = null;
-        let minDist = Infinity;
-
-        // Find which portal we are currently looking at/closest to
-        for (const p of this.portals) {
-            if (this.activeRoom === p.roomA || this.activeRoom === p.roomB) {
-                const pPos = this.activeRoom === p.roomA ? p.posA : p.posB;
-                const dist = Math.abs(camera.pos[2] - pPos[2]);
-                if (dist < minDist) {
-                    minDist = dist;
-                    closestPortal = p;
-                }
-            }
-        }
-
-        if (!closestPortal) return { virtualModels: [], mainModels: [], virtualView: camera.getViewMatrix() };
-
-        const currentPortalPos = this.activeRoom === closestPortal.roomA ? closestPortal.posA : closestPortal.posB;
-        const targetPortalPos = this.activeRoom === closestPortal.roomA ? closestPortal.posB : closestPortal.posA;
-        const virtualRoom = this.activeRoom === closestPortal.roomA ? closestPortal.roomB : closestPortal.roomA;
-
-        const camOffset = Vec3.sub(camera.pos, currentPortalPos);
-        const virtualCamPos = Vec3.add(targetPortalPos, camOffset);
-
-        const virtualModels = this.boxes
-            .filter(b => b.room === virtualRoom)
-            .map(b => ({ model: Mat4.multiply(Mat4.translation(b.pos), Mat4.scaling(b.scale)), mult: b.mult }));
-
-        const mainModels = this.boxes
-            .filter(b => b.room === this.activeRoom)
-            .map(b => ({ model: Mat4.multiply(Mat4.translation(b.pos), Mat4.scaling(b.scale)), mult: b.mult }));
+        const portalsData: { virtualModels: any[], virtualView: Float32Array }[] = [];
         
-        // Add the active portal quad to punch the hole
-        mainModels.push({ 
-            model: Mat4.multiply(Mat4.translation(currentPortalPos), Mat4.scaling([4, 3, 0.01])), 
-            mult: [1, 1, 1, 1], 
-            isPortal: true 
-        } as any);
+        // 1. Get all the standard models for the room we are currently standing in
+        const mainModels: any[] = this.boxes
+            .filter(b => b.room === this.activeRoom)
+            .map(b => ({ 
+                model: Mat4.multiply(Mat4.translation(b.pos), Mat4.scaling(b.scale)), 
+                mult: b.mult 
+                // portalIndex is naturally undefined here, which the engine handles
+            }));
+
+        // 2. Find ALL portals connected to our current active room
+        const activePortals = this.portals.filter(p => this.activeRoom === p.roomA || this.activeRoom === p.roomB);
+
+        // 3. Loop through every active portal and generate its specific view data
+        activePortals.forEach((portal, index) => {
+            const currentPortalPos = this.activeRoom === portal.roomA ? portal.posA : portal.posB;
+            const targetPortalPos = this.activeRoom === portal.roomA ? portal.posB : portal.posA;
+            const virtualRoom = this.activeRoom === portal.roomA ? portal.roomB : portal.roomA;
+
+            // Calculate where the camera *would* be inside the target room
+            const camOffset = Vec3.sub(camera.pos, currentPortalPos);
+            const virtualCamPos = Vec3.add(targetPortalPos, camOffset);
+
+            // Get the geometry for the room this specific portal is looking into
+            const virtualModels = this.boxes
+                .filter(b => b.room === virtualRoom)
+                .map(b => ({ 
+                    model: Mat4.multiply(Mat4.translation(b.pos), Mat4.scaling(b.scale)), 
+                    mult: b.mult 
+                }));
+
+            // Store this portal's specific rendering data
+            portalsData.push({ 
+                virtualModels, 
+                virtualView: camera.getVirtualViewMatrix(virtualCamPos) 
+            });
+
+            // 4. Add the physical portal quad to the main room, linked to this index!
+            // Note: I swapped the hardcoded width of '4' to use 'portal.width' so it scales properly
+            mainModels.push({ 
+                model: Mat4.multiply(Mat4.translation(currentPortalPos), Mat4.scaling([portal.width, 3, 0.01])), 
+                mult: [1, 1, 1, 1], 
+                portalIndex: index  // <--- This is the crucial link to Engine.ts
+            });
+        });
 
         return { 
-            virtualModels, 
-            mainModels, 
-            virtualView: camera.getVirtualViewMatrix(virtualCamPos) 
+            portalsData, 
+            mainModels 
         };
     }
 }

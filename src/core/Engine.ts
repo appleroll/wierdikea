@@ -115,7 +115,13 @@ export class Engine {
         this.depthTextureView = this.depthTexture.createView();
     }
 
-    render(projMatrix: Float32Array, viewMatrix: Float32Array, models: {model: Float32Array, mult: number[], isPortal?: boolean}[], targetView?: GPUTextureView, portalView?: GPUTextureView) {
+render(
+        projMatrix: Float32Array, 
+        viewMatrix: Float32Array, 
+        models: {model: Float32Array, mult: number[], portalIndex?: number}[], 
+        targetView?: GPUTextureView, 
+        portalViews?: GPUTextureView[] // <--- Now accepts an array of textures
+    ) {
         if (!this.device) return;
 
         const viewProj = Mat4.multiply(projMatrix, viewMatrix);
@@ -136,18 +142,24 @@ export class Engine {
         pass.setVertexBuffer(0, this.vertexBuffer);
         pass.setVertexBuffer(1, this.colorBuffer);
 
-        // Bind the portal texture (or dummy if not provided)
-        const pBindGroup = this.device.createBindGroup({
+        // 1. Pre-create a bind group for every active portal texture
+        const pBindGroups = (portalViews || []).map(view => 
+            this.device.createBindGroup({
+                layout: this.pipeline.getBindGroupLayout(2),
+                entries: [{ binding: 0, resource: view }]
+            })
+        );
+        
+        const dummyPBindGroup = this.device.createBindGroup({
             layout: this.pipeline.getBindGroupLayout(2),
-            entries: [{ binding: 0, resource: portalView || this.dummyTextureView }]
+            entries: [{ binding: 0, resource: this.dummyTextureView }]
         });
-        pass.setBindGroup(2, pBindGroup);
 
         models.forEach((box, i) => {
             let cache = this.modelBindGroups.get(i.toString());
             if (!cache) {
                 const buffer = this.device.createBuffer({
-                    size: 96, // 64 (Mat4) + 16 (Color) + 16 (PortalData)
+                    size: 96,
                     usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
                 });
                 const bindGroup = this.device.createBindGroup({
@@ -160,7 +172,15 @@ export class Engine {
 
             this.device.queue.writeBuffer(cache.buffer, 0, box.model);
             this.device.queue.writeBuffer(cache.buffer, 64, new Float32Array(box.mult));
-            this.device.queue.writeBuffer(cache.buffer, 80, new Float32Array([box.isPortal ? 1 : 0, 0, 0, 0]));
+            
+            // 2. Dynamically bind the correct texture right before drawing this specific mesh
+            if (box.portalIndex !== undefined && box.portalIndex >= 0 && box.portalIndex < pBindGroups.length) {
+                this.device.queue.writeBuffer(cache.buffer, 80, new Float32Array([1, 0, 0, 0])); // isPortal = true
+                pass.setBindGroup(2, pBindGroups[box.portalIndex]);
+            } else {
+                this.device.queue.writeBuffer(cache.buffer, 80, new Float32Array([0, 0, 0, 0])); // isPortal = false
+                pass.setBindGroup(2, dummyPBindGroup);
+            }
 
             pass.setBindGroup(1, cache.bindGroup);
             pass.draw(36, 1, 0, 0);
