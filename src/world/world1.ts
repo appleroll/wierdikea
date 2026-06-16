@@ -10,7 +10,7 @@ export function buildWorld1(init: boolean, existingScene?: Scene): Scene {
 
     const worldGeometry = [
         // Huge floor
-        { pos: [0, -0.5, 10] as Vec3, scale: [100, 1, 100] as Vec3, mult: [0.2, 1, 0.2, 1], room: 'Null' },
+        { pos: [0, -0.5, 10] as Vec3, scale: [500, 1, 500] as Vec3, mult: [0.2, 1, 0.2, 1], room: 'Null' },
 
         /// TUNNEL 1 REFERENCE BLOCKS
         { pos: [0, 0.5, -15] as Vec3, scale: [1, 2, 1] as Vec3, mult: [0.8, 0.2, 0.2, 1], room: 'Null' },
