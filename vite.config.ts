@@ -1,5 +1,9 @@
 import { defineConfig } from 'vite'
+import Terminal from 'vite-plugin-terminal'
 
 export default defineConfig({
-  base: '/supernoneuclid/', // 👈 This fixes your GitHub Pages 404
+  base: '/supernoneuclid/',
+  plugins: [
+    Terminal()
+  ]
 })

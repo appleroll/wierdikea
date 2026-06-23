@@ -72,10 +72,12 @@ export class Scene {
                 virtualView: camera.getVirtualViewMatrix(virtualCamPos) 
             });
 
-            // 4. Add the physical portal quad to the main room, linked to this index!
-            // Note: I swapped the hardcoded width of '4' to use 'portal.width' so it scales properly
+            // 4. Orient the physical portal quad based on the portal's axis
+            const scaleX = portal.axis === 'X' ? 0.01 : portal.width;
+            const scaleZ = portal.axis === 'X' ? portal.width : 0.01;
+
             mainModels.push({ 
-                model: Mat4.multiply(Mat4.translation(currentPortalPos), Mat4.scaling([portal.width, 3, 0.01])), 
+                model: Mat4.multiply(Mat4.translation(currentPortalPos), Mat4.scaling([scaleX, 3, scaleZ])), 
                 mult: [1, 1, 1, 1], 
                 portalIndex: index  // <--- This is the crucial link to Engine.ts
             });

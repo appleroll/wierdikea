@@ -31,12 +31,9 @@ export class TardisBox {
         scene.addBox({ pos: [cx - S - T/2, cy, cz], scale: [T, height, S*2], mult: extColor, room: mainRoom }); // West wall
         scene.addBox({ pos: [cx + S + T/2, cy, cz], scale: [T, height, S*2], mult: extColor, room: mainRoom }); // East wall
         scene.addBox({ pos: [cx, cy, cz - S - T/2], scale: [S*2, height, T], mult: extColor, room: mainRoom }); // North wall
-        
-        // South Wall (With a gap for the entrance on the Left/SW side)
+        scene.addBox({ pos: [cx, cy + height/2 + T/2, cz], scale: [S*2, T, S*2], mult: extColor, room: mainRoom });
         scene.addBox({ pos: [cx + S/2, cy, cz + S + T/2], scale: [S, height, T], mult: extColor, room: mainRoom });
 
-        // The 4 Quadrants map to physical offsets relative to center
-        // 0=SW, 1=NW, 2=NE, 3=SE
         const quadCenters = [
             [-S/2, S/2],  // SW
             [-S/2, -S/2], // NW
@@ -49,7 +46,7 @@ export class TardisBox {
             const room = roomNames[i];
             const offset = hiddenOffsets[i];
             const color = colors[i];
-            const quadIdx = i % 4; // Which physical quadrant does this represent?
+            const quadIdx = i % 4;
             
             const qx = cx + quadCenters[quadIdx][0];
             const qz = cz + quadCenters[quadIdx][1];
