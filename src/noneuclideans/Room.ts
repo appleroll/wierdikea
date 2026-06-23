@@ -1,0 +1,131 @@
+import { Vec3 } from '../math/Vec3';
+import { Portal } from './Portal';
+import { Scene } from '../world/Scene';
+
+export interface TardisConfig {
+    mainRoom: string;
+    roomNames: string[]; // Array of 8 strings
+    centerPos: Vec3;     // The exact physical center of the cross partition
+    quadrantSize: number; // Width/Depth of a single quadrant (Total box is 2x this)
+    height: number;
+    hiddenOffsets: Vec3[]; // 8 distant coordinates to hide the geometry
+    colors: number[][];    // 8 colors to show the transition
+}
+
+export class TardisBox {
+    private config: TardisConfig;
+
+    constructor(config: TardisConfig) {
+        this.config = config;
+    }
+
+    addToScene(scene: Scene, init: boolean) {
+        const { mainRoom, roomNames, centerPos, quadrantSize: S, height, hiddenOffsets, colors } = this.config;
+        const T = 0.2; // Wall thickness
+        const cx = centerPos[0];
+        const cy = centerPos[1];
+        const cz = centerPos[2];
+
+        // 1. BUILD EXTERIOR SHELL IN MAIN ROOM (A 2S x 2S box)
+        const extColor = [0.4, 0.4, 0.4, 1];
+        scene.addBox({ pos: [cx - S - T/2, cy, cz], scale: [T, height, S*2], mult: extColor, room: mainRoom }); // West wall
+        scene.addBox({ pos: [cx + S + T/2, cy, cz], scale: [T, height, S*2], mult: extColor, room: mainRoom }); // East wall
+        scene.addBox({ pos: [cx, cy, cz - S - T/2], scale: [S*2, height, T], mult: extColor, room: mainRoom }); // North wall
+        
+        // South Wall (With a gap for the entrance on the Left/SW side)
+        scene.addBox({ pos: [cx + S/2, cy, cz + S + T/2], scale: [S, height, T], mult: extColor, room: mainRoom });
+
+        // The 4 Quadrants map to physical offsets relative to center
+        // 0=SW, 1=NW, 2=NE, 3=SE
+        const quadCenters = [
+            [-S/2, S/2],  // SW
+            [-S/2, -S/2], // NW
+            [S/2, -S/2],  // NE
+            [S/2, S/2]    // SE
+        ];
+
+        // 2. BUILD THE 8 VIRTUAL ROOMS
+        for (let i = 0; i < 8; i++) {
+            const room = roomNames[i];
+            const offset = hiddenOffsets[i];
+            const color = colors[i];
+            const quadIdx = i % 4; // Which physical quadrant does this represent?
+            
+            const qx = cx + quadCenters[quadIdx][0];
+            const qz = cz + quadCenters[quadIdx][1];
+            
+            const vx = qx + offset[0];
+            const vy = cy + offset[1];
+            const vz = qz + offset[2];
+
+            // Floor & Ceiling for this quadrant
+            scene.addBox({ pos: [vx, vy - height/2, vz], scale: [S, T, S], mult: color, room: room });
+            scene.addBox({ pos: [vx, vy + height/2, vz], scale: [S, T, S], mult: color, room: room });
+
+            // Add the physical boundary walls based on which quadrant this is
+            if (quadIdx === 0) { // SW: Add West and South outer walls
+                scene.addBox({ pos: [vx - S/2, vy, vz], scale: [T, height, S], mult: color, room: room });
+                if (i !== 0) scene.addBox({ pos: [vx, vy, vz + S/2], scale: [S, height, T], mult: color, room: room });
+            }
+            if (quadIdx === 1) { // NW: Add West and North outer walls
+                scene.addBox({ pos: [vx - S/2, vy, vz], scale: [T, height, S], mult: color, room: room });
+                scene.addBox({ pos: [vx, vy, vz - S/2], scale: [S, height, T], mult: color, room: room });
+            }
+            if (quadIdx === 2) { // NE: Add East and North outer walls
+                scene.addBox({ pos: [vx + S/2, vy, vz], scale: [T, height, S], mult: color, room: room });
+                scene.addBox({ pos: [vx, vy, vz - S/2], scale: [S, height, T], mult: color, room: room });
+            }
+            if (quadIdx === 3) { // SE: Add East and South outer walls
+                scene.addBox({ pos: [vx + S/2, vy, vz], scale: [T, height, S], mult: color, room: room });
+                scene.addBox({ pos: [vx, vy, vz + S/2], scale: [S, height, T], mult: color, room: room });
+            }
+
+            // Always add the central pillar partition blocker
+            scene.addBox({ pos: [cx + offset[0], vy, cz + offset[2]], scale: [0.4, height, 0.4], mult: color, room: room });
+        }
+
+        // 3. LINK THE 8 ROOMS IN A LOOP
+        if (init) {
+            // Entrance: Main Room -> Room 0 (Entering the SW quadrant from the South)
+            const entrancePhysical: Vec3 = [cx - S/2, cy, cz + S];
+            const entranceVirtual: Vec3 = [cx - S/2 + hiddenOffsets[0][0], cy, cz + S + hiddenOffsets[0][2]];
+            
+            scene.addPortal(new Portal(
+                mainRoom, entrancePhysical,
+                roomNames[0], entranceVirtual,
+                entrancePhysical[2], entranceVirtual[2],
+                -1, S, 'Z'
+            ));
+
+            // The doorways that connect the quadrants (Clockwise)
+            const doorways = [
+                { axis: 'Z' as const, dir: -1 as const, pos: [-S/2, 0] }, // SW -> NW (Cross Z axis)
+                { axis: 'X' as const, dir:  1 as const, pos: [0, -S/2] }, // NW -> NE (Cross X axis)
+                { axis: 'Z' as const, dir:  1 as const, pos: [S/2, 0] },  // NE -> SE (Cross Z axis)
+                { axis: 'X' as const, dir: -1 as const, pos: [0, S/2] }   // SE -> SW (Cross X axis)
+            ];
+
+            // Connect Room i to Room i+1
+            for (let i = 0; i < 8; i++) {
+                const nextI = (i + 1) % 8;
+                const door = doorways[i % 4];
+
+                const doorPhysX = cx + door.pos[0];
+                const doorPhysZ = cz + door.pos[1];
+
+                const posA: Vec3 = [doorPhysX + hiddenOffsets[i][0], cy, doorPhysZ + hiddenOffsets[i][2]];
+                const posB: Vec3 = [doorPhysX + hiddenOffsets[nextI][0], cy, doorPhysZ + hiddenOffsets[nextI][2]];
+
+                const triggerA = door.axis === 'X' ? cx + hiddenOffsets[i][0] : cz + hiddenOffsets[i][2];
+                const triggerB = door.axis === 'X' ? cx + hiddenOffsets[nextI][0] : cz + hiddenOffsets[nextI][2];
+
+                scene.addPortal(new Portal(
+                    roomNames[i], posA,
+                    roomNames[nextI], posB,
+                    triggerA, triggerB,
+                    door.dir, S, door.axis
+                ));
+            }
+        }
+    }
+}

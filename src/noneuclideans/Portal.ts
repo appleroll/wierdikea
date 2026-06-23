@@ -6,50 +6,51 @@ export class Portal {
     public posA: Vec3;
     public roomB: string;
     public posB: Vec3;
-    public triggerZA: number;
-    public triggerZB: number;
+    public triggerA: number;
+    public triggerB: number;
     public dirAtoB: -1 | 1;
     public width: number;
+    public axis: 'X' | 'Z';
+
     constructor(
-        roomA: string,
-        posA: Vec3,
-        roomB: string,
-        posB: Vec3,
-        triggerZA: number,
-        triggerZB: number,
-        dirAtoB: -1 | 1,
-        width: number = 4
+        roomA: string, posA: Vec3, roomB: string, posB: Vec3,
+        triggerA: number, triggerB: number, dirAtoB: -1 | 1, width: number = 4,
+        axis: 'X' | 'Z' = 'Z' // Defaults to Z so it doesn't break your tunnels!
     ) {
         this.roomA = roomA;
         this.posA = posA;
         this.roomB = roomB;
         this.posB = posB;
-        this.triggerZA = triggerZA;
-        this.triggerZB = triggerZB;
+        this.triggerA = triggerA;
+        this.triggerB = triggerB;
         this.dirAtoB = dirAtoB;
         this.width = width;
+        this.axis = axis;
     }
 
     checkCrossing(camera: Camera, currentRoom: string): string | null {
-        if (currentRoom === this.roomA) {
-            // Did we cross from A into B?
-            const crossed = this.dirAtoB === -1 
-                ? camera.prevPos[2] > this.triggerZA && camera.pos[2] <= this.triggerZA
-                : camera.prevPos[2] < this.triggerZA && camera.pos[2] >= this.triggerZA;
+        // If axis is X, we check index 0. If Z, we check index 2.
+        const axisIdx = this.axis === 'X' ? 0 : 2;
+        // The bounding width is evaluated on the perpendicular axis
+        const crossIdx = this.axis === 'X' ? 2 : 0; 
 
-            if (crossed && Math.abs(camera.pos[0] - this.posA[0]) < this.width / 2) {
+        if (currentRoom === this.roomA) {
+            const crossed = this.dirAtoB === -1 
+                ? camera.prevPos[axisIdx] > this.triggerA && camera.pos[axisIdx] <= this.triggerA
+                : camera.prevPos[axisIdx] < this.triggerA && camera.pos[axisIdx] >= this.triggerA;
+
+            if (crossed && Math.abs(camera.pos[crossIdx] - this.posA[crossIdx]) < this.width / 2) {
                 const offset = Vec3.sub(this.posB, this.posA);
                 camera.pos = Vec3.add(camera.pos, offset);
                 return this.roomB;
             }
         } else if (currentRoom === this.roomB) {
-            // Did we cross from B back into A? (Invert the direction)
             const dirBtoA = -this.dirAtoB; 
             const crossed = dirBtoA === -1 
-                ? camera.prevPos[2] > this.triggerZB && camera.pos[2] <= this.triggerZB
-                : camera.prevPos[2] < this.triggerZB && camera.pos[2] >= this.triggerZB;
+                ? camera.prevPos[axisIdx] > this.triggerB && camera.pos[axisIdx] <= this.triggerB
+                : camera.prevPos[axisIdx] < this.triggerB && camera.pos[axisIdx] >= this.triggerB;
 
-            if (crossed && Math.abs(camera.pos[0] - this.posB[0]) < this.width / 2) {
+            if (crossed && Math.abs(camera.pos[crossIdx] - this.posB[crossIdx]) < this.width / 2) {
                 const offset = Vec3.sub(this.posA, this.posB);
                 camera.pos = Vec3.add(camera.pos, offset);
                 return this.roomA;
