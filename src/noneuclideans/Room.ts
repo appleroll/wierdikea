@@ -94,6 +94,97 @@ export class IKEAShell {
 
             // Always add the central pillar partition blocker
             scene.addBox({ pos: [cx + offset[0], vy, cz + offset[2]], scale: [0.4, height, 0.4], mult: color, room: room });
+            // add walls partitioning the quadrants
+            // if (quadIdx === 0 || quadIdx === 1) { // SW or NW: Add West partition wall
+            //     scene.addBox({ pos: [cx - S/2 + offset[0], vy, cz + offset[2]], scale: [T, height, S], mult: color, room: room });
+            // }
+            // if (quadIdx === 1 || quadIdx === 2) { // NW or NE: Add North partition wall
+            //     scene.addBox({ pos: [cx + offset[0], vy, cz - S/2 + offset[2]], scale: [S, height, T], mult: color, room: room });
+            // }
+            // if (quadIdx === 2 || quadIdx === 3) { // NE or SE: Add East partition wall
+            //     scene.addBox({ pos: [cx + S/2 + offset[0], vy, cz + offset[2]], scale: [T, height, S], mult: color, room: room });
+            // }
+            // if (quadIdx === 3 || quadIdx === 0) { // SE or SW: Add South partition wall
+            //     scene.addBox({ pos: [cx + offset[0], vy, cz + S/2 + offset[2]], scale: [S, height, T], mult: color, room: room });
+            // }
+// Half partition walls (hide portal transitions)
+
+// Q1 (SW)
+if (quadIdx === 0) {
+    // Vertical wall: pillar -> south
+    scene.addBox({
+        pos: [cx + offset[0], vy, cz + S / 4 + offset[2]],
+        scale: [T, height, S / 2],
+        mult: color,
+        room: room
+    });
+
+    // Horizontal wall: pillar -> west
+    scene.addBox({
+        pos: [cx - S / 4 + offset[0], vy, cz + offset[2]],
+        scale: [S / 2, height, T],
+        mult: color,
+        room: room
+    });
+}
+
+// Q2 (NW)
+if (quadIdx === 1) {
+    // Vertical wall: pillar -> north
+    scene.addBox({
+        pos: [cx + offset[0], vy, cz - S / 4 + offset[2]],
+        scale: [T, height, S / 2],
+        mult: color,
+        room: room
+    });
+
+    // Horizontal wall: pillar -> west
+    scene.addBox({
+        pos: [cx - S / 4 + offset[0], vy, cz + offset[2]],
+        scale: [S / 2, height, T],
+        mult: color,
+        room: room
+    });
+}
+
+// Q3 (NE)
+if (quadIdx === 2) {
+    // Vertical wall: pillar -> north
+    scene.addBox({
+        pos: [cx + offset[0], vy, cz - S / 4 + offset[2]],
+        scale: [T, height, S / 2],
+        mult: color,
+        room: room
+    });
+
+    // Horizontal wall: pillar -> east
+    scene.addBox({
+        pos: [cx + S / 4 + offset[0], vy, cz + offset[2]],
+        scale: [S / 2, height, T],
+        mult: color,
+        room: room
+    });
+}
+
+// Q4 (SE)
+if (quadIdx === 3) {
+    // Vertical wall: pillar -> south
+    scene.addBox({
+        pos: [cx + offset[0], vy, cz + S / 4 + offset[2]],
+        scale: [T, height, S / 2],
+        mult: color,
+        room: room
+    });
+
+    // Horizontal wall: pillar -> east
+    scene.addBox({
+        pos: [cx + S / 4 + offset[0], vy, cz + offset[2]],
+        scale: [S / 2, height, T],
+        mult: color,
+        room: room
+    });
+}
+
         }
 
         if (init) {
