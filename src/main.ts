@@ -39,32 +39,33 @@ async function main() {
         camera.update(dt, input);
         scene.updateTeleportation(camera);
 
-        // NOTE: You will need to update Scene.ts to return an array of portalsData (see step 3 below)
-        const { portalsData, mainModels } = scene.getRenderData(camera) as any; 
-        
         const projMatrix = Mat4.perspective(Math.PI/3, canvas.width / canvas.height, 0.1, 100.0);
-        const mainView = camera.getViewMatrix();
 
-        // Ensure we have enough physical texture targets for the active portals
-        while (portalTargets.length < portalsData.length) {
+        // 1. Get the flat list of rendering jobs (Depth 2 = Portal inside a Portal)
+        const { jobs, totalTextures } = scene.getRenderJobs(camera, 4); 
+
+        // 2. Dynamically ensure we have exactly enough textures allocated
+        while (portalTargets.length < totalTextures) {
             portalTargets.push(engine.createRenderTarget(canvas.width, canvas.height));
         }
+        
+        // Pass ALL available textures to the engine so the shader can sample any of them
+        const allTextureViews = portalTargets.map(t => t.view);
 
-        const activePortalViews: GPUTextureView[] = [];
-
-        // 1. Render each portal's view into its dedicated texture
-        portalsData.forEach((pData: any, index: number) => {
-            const target = portalTargets[index];
-            engine.render(projMatrix, pData.virtualView, pData.virtualModels, target.view, undefined);
-            activePortalViews.push(target.view);
+        // 3. Execute jobs. Because of our recursive function, deepest rooms render first!
+        jobs.forEach((job: any) => {
+            if (job.isMain) {
+                // Render main room directly to canvas
+                engine.render(projMatrix, job.view, job.models, undefined, allTextureViews);
+            } else {
+                // Render virtual room into its dynamically assigned texture
+                const targetView = portalTargets[job.targetIndex].view;
+                engine.render(projMatrix, job.view, job.models, targetView, allTextureViews);
+            }
         });
-
-        // 2. Render the main room, passing ALL portal textures to the engine
-        engine.render(projMatrix, mainView, mainModels, undefined, activePortalViews);
 
         requestAnimationFrame(loop);
     }
-    
     requestAnimationFrame(loop);
 }
 
