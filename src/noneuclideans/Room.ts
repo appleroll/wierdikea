@@ -1,8 +1,9 @@
 import { Vec3 } from '../math/Vec3';
 import { Portal } from './Portal';
 import { Scene } from '../world/Scene';
+import { ikeaColours } from '../colour/ikeaColours';
 
-export interface TardisConfig {
+export interface IKEAShellConfig {
     mainRoom: string;
     roomNames: string[]; // Array of 8 strings
     centerPos: Vec3;     // The exact physical center of the cross partition
@@ -13,10 +14,10 @@ export interface TardisConfig {
     exteriorColor?: number[]; // Optional color for the exterior shell
 }
 
-export class TardisBox {
-    private config: TardisConfig;
+export class IKEAShell {
+    private config: IKEAShellConfig;
 
-    constructor(config: TardisConfig) {
+    constructor(config: IKEAShellConfig) {
         this.config = config;
     }
 
@@ -27,7 +28,7 @@ export class TardisBox {
         const cy = centerPos[1];
         const cz = centerPos[2];
 
-        const extColor = [0.2, 0.2, 1, 1];
+        const extColor = ikeaColours.blue;
         scene.addBox({ pos: [cx - S - T/2, cy, cz], scale: [T, height, S*2], mult: extColor, room: mainRoom }); // West wall
         scene.addBox({ pos: [cx + S + T/2, cy, cz], scale: [T, height, S*2], mult: extColor, room: mainRoom }); // East wall
         scene.addBox({ pos: [cx, cy, cz - S - T/2], scale: [S*2, height, T], mult: extColor, room: mainRoom }); // North wall
@@ -69,7 +70,17 @@ export class TardisBox {
             // Add the physical boundary walls based on which quadrant this is
             if (quadIdx === 0) { // SW: Add West and South outer walls
                 scene.addBox({ pos: [vx - S/2, vy, vz], scale: [T, height, S], mult: color, room: room });
-                if (i !== 0) scene.addBox({ pos: [vx, vy, vz + S/2], scale: [S, height, T], mult: color, room: room });
+                if (i !== 0) {
+                    scene.addBox({ pos: [vx, vy, vz + S/2], scale: [S, height, T], mult: color, room: room });
+                } else {
+                    // ?bookmark ?landmark ADD THE IKEA ENTRANCE
+                    // based on image https://c8.alamy.com/comp/F4MMND/entrance-of-ikea-springvale-victoria-australia-F4MMND.jpg
+                    const ikeaYellow = ikeaColours.yellow;
+                    scene.addBox({ pos: [vx - S/4, vy, vz + S/2], scale: [S/2, height, T], mult: extColor, room: room });
+                    scene.addBox({ pos: [vx + S/4, vy + height/2 + 0.125, vz + S/2], scale: [S/2, height, T], mult: extColor, room: room });
+                    scene.addBox({ pos: [vx + S/4, vy - 1, vz + S/2], scale: [S/2, height/8 + 1, T + 0.1], mult: ikeaYellow, room: room });
+                    scene.addBox({ pos: [vx + S/4 - 5.25, -2, vz + S/2], scale: [2, height, T + 0.1], mult: ikeaYellow, room: room });
+                }
             }
             if (quadIdx === 1) { // NW: Add West and North outer walls
                 scene.addBox({ pos: [vx - S/2, vy, vz], scale: [T, height, S], mult: color, room: room });

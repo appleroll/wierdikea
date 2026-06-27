@@ -4,7 +4,7 @@
 
 import { Scene } from './Scene';
 // import { Tunnel } from '../noneuclideans/Tunnel';
-import { TardisBox } from '../noneuclideans/Room'; 
+import { IKEAShell } from '../noneuclideans/Room'; 
 import { Vec3 } from '../math/Vec3';
 
 // const ROOM_B_Z_OFFSET = 7; 
@@ -55,14 +55,15 @@ export function buildWorld1(init: boolean, existingScene?: Scene): Scene {
     // });
 
     // --- THE 8-ROOM HYPERCUBE ---
-    const hyperBox = new TardisBox({
+    const hyperBox = new IKEAShell({
         mainRoom: 'A',
         roomNames: ['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8'],
         centerPos: [-15, 6.5, -5],
-        quadrantSize: 16,
+        quadrantSize: 25,
         height: 13,
         exteriorColor: [0.4, 0.4, 0.4, 1],
-        // Push the 8 virtual rooms far away so they don't overlap
+
+
         hiddenOffsets: [
             [-100, 0, 0],   // Q1
             [-100, 0, -20], // Q2
