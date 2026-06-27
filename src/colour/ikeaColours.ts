@@ -1,6 +1,9 @@
 export const ikeaColours = {
     blue: RGBTodRGB(0, 87, 173, 1),
     yellow: RGBTodRGB(251, 218, 12, 1),
+
+    // theoretical white, in reality its slightly greyer
+    white: RGBTodRGB(250, 250, 250, 1),
 };
 
 function RGBTodRGB(r: number, g: number, b: number, a: number): [number, number, number, number] {

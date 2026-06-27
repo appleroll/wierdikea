@@ -6,6 +6,7 @@ import { Scene } from './Scene';
 // import { Tunnel } from '../noneuclideans/Tunnel';
 import { IKEAShell } from '../noneuclideans/Room'; 
 import { Vec3 } from '../math/Vec3';
+import { ikeaColours } from '../colour/ikeaColours';
 
 // const ROOM_B_Z_OFFSET = 7; 
 // const ROOM_C_Z_OFFSET = -10; 
@@ -58,11 +59,9 @@ export function buildWorld1(init: boolean, existingScene?: Scene): Scene {
     const hyperBox = new IKEAShell({
         mainRoom: 'A',
         roomNames: ['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8'],
-        centerPos: [-15, 6.5, -5],
+        centerPos: [0, 6.5, -30],
         quadrantSize: 25,
         height: 13,
-        exteriorColor: [0.4, 0.4, 0.4, 1],
-
 
         hiddenOffsets: [
             [-100, 0, 0],   // Q1
@@ -75,16 +74,16 @@ export function buildWorld1(init: boolean, existingScene?: Scene): Scene {
             [-100, 0, -140] // Q8
         ],
 
-        // just make em all blue for now, bc ikea
+        // white interior
         colors: [
-        [0.95, 0.95, 0.95, 1], // Q1 floor/walls
-        [0.95, 0.95, 0.95, 1],
-        [0.95, 0.95, 0.95, 1],
-        [0.95, 0.95, 0.95, 1],
-        [0.95, 0.95, 0.95, 1],
-        [0.95, 0.95, 0.95, 1],
-        [0.95, 0.95, 0.95, 1],
-        [0.95, 0.95, 0.95, 1]
+            ikeaColours.white, // Q1
+            ikeaColours.white, // Q2
+            ikeaColours.white, // Q3
+            ikeaColours.white, // Q4
+            ikeaColours.white, // Q5
+            ikeaColours.white, // Q6
+            ikeaColours.white, // Q7
+            ikeaColours.white  // Q8
         ]
     });
 

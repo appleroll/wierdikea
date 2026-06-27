@@ -11,7 +11,6 @@ export interface IKEAShellConfig {
     height: number;
     hiddenOffsets: Vec3[]; // 8 distant coordinates to hide the geometry
     colors: number[][];
-    exteriorColor?: number[]; // Optional color for the exterior shell
 }
 
 export class IKEAShell {
@@ -66,14 +65,12 @@ export class IKEAShell {
 
             scene.addBox({ pos: [vx, vy + height/2 - 7, vz], scale: [S, T, S], mult: color, room: room });
 
-
-            // Add the physical boundary walls based on which quadrant this is
             if (quadIdx === 0) { // SW: Add West and South outer walls
                 scene.addBox({ pos: [vx - S/2, vy, vz], scale: [T, height, S], mult: color, room: room });
                 if (i !== 0) {
                     scene.addBox({ pos: [vx, vy, vz + S/2], scale: [S, height, T], mult: color, room: room });
                 } else {
-                    // ?bookmark ?landmark ADD THE IKEA ENTRANCE
+                    // ?bookmark ?landmark IKEA ENTRANCE
                     // based on image https://c8.alamy.com/comp/F4MMND/entrance-of-ikea-springvale-victoria-australia-F4MMND.jpg
                     const ikeaYellow = ikeaColours.yellow;
                     scene.addBox({ pos: [vx - S/4, vy, vz + S/2], scale: [S/2, height, T], mult: extColor, room: room });
@@ -99,7 +96,6 @@ export class IKEAShell {
             scene.addBox({ pos: [cx + offset[0], vy, cz + offset[2]], scale: [0.4, height, 0.4], mult: color, room: room });
         }
 
-        // 3. LINK THE 8 ROOMS IN A LOOP
         if (init) {
             // Entrance: Main Room -> Room 0 (Entering the SW quadrant from the South)
             const entrancePhysical: Vec3 = [cx - S/2, cy, cz + S];
