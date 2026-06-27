@@ -9,7 +9,8 @@ export interface TardisConfig {
     quadrantSize: number; // Width/Depth of a single quadrant (Total box is 2x this)
     height: number;
     hiddenOffsets: Vec3[]; // 8 distant coordinates to hide the geometry
-    colors: number[][];    // 8 colors to show the transition
+    colors: number[][];
+    exteriorColor?: number[]; // Optional color for the exterior shell
 }
 
 export class TardisBox {
@@ -20,14 +21,13 @@ export class TardisBox {
     }
 
     addToScene(scene: Scene, init: boolean) {
-        const { mainRoom, roomNames, centerPos, quadrantSize: S, height, hiddenOffsets, colors } = this.config;
+        const { mainRoom, roomNames, centerPos, quadrantSize: S, height, hiddenOffsets, colors} = this.config;
         const T = 0.2; // Wall thickness
         const cx = centerPos[0];
         const cy = centerPos[1];
         const cz = centerPos[2];
 
-        // 1. BUILD EXTERIOR SHELL IN MAIN ROOM (A 2S x 2S box)
-        const extColor = [0.4, 0.4, 0.4, 1];
+        const extColor = [0.2, 0.2, 1, 1];
         scene.addBox({ pos: [cx - S - T/2, cy, cz], scale: [T, height, S*2], mult: extColor, room: mainRoom }); // West wall
         scene.addBox({ pos: [cx + S + T/2, cy, cz], scale: [T, height, S*2], mult: extColor, room: mainRoom }); // East wall
         scene.addBox({ pos: [cx, cy, cz - S - T/2], scale: [S*2, height, T], mult: extColor, room: mainRoom }); // North wall
@@ -41,7 +41,6 @@ export class TardisBox {
             [S/2, S/2]    // SE
         ];
 
-        // 2. BUILD THE 8 VIRTUAL ROOMS
         for (let i = 0; i < 8; i++) {
             const room = roomNames[i];
             const offset = hiddenOffsets[i];
@@ -58,6 +57,14 @@ export class TardisBox {
             // Floor & Ceiling for this quadrant
             scene.addBox({ pos: [vx, vy - height/2, vz], scale: [S, T, S], mult: color, room: room });
             scene.addBox({ pos: [vx, vy + height/2, vz], scale: [S, T, S], mult: color, room: room });
+
+            // here we add another ceiling bc ikea is split into different floors, and lets just make it so IKEA is on the ground floor
+            // here we pose some questions
+            // 1. how high is IKEA?
+            // 2. does American IKEA differ from our Aussie one?
+
+            scene.addBox({ pos: [vx, vy + height/2 - 7, vz], scale: [S, T, S], mult: color, room: room });
+
 
             // Add the physical boundary walls based on which quadrant this is
             if (quadIdx === 0) { // SW: Add West and South outer walls
@@ -88,10 +95,16 @@ export class TardisBox {
             const entranceVirtual: Vec3 = [cx - S/2 + hiddenOffsets[0][0], cy, cz + S + hiddenOffsets[0][2]];
             
             scene.addPortal(new Portal(
-                mainRoom, entrancePhysical,
-                roomNames[0], entranceVirtual,
-                entrancePhysical[2], entranceVirtual[2],
-                -1, S, 'Z'
+                mainRoom, 
+                entrancePhysical,
+                roomNames[0], 
+                entranceVirtual,
+                entrancePhysical[2], 
+                entranceVirtual[2],
+                -1, 
+                S, 
+                height, 
+                'Z'
             ));
 
             // The doorways that connect the quadrants (Clockwise)
@@ -117,10 +130,16 @@ export class TardisBox {
                 const triggerB = door.axis === 'X' ? cx + hiddenOffsets[nextI][0] : cz + hiddenOffsets[nextI][2];
 
                 scene.addPortal(new Portal(
-                    roomNames[i], posA,
-                    roomNames[nextI], posB,
-                    triggerA, triggerB,
-                    door.dir, S, door.axis
+                    roomNames[i], 
+                    posA,
+                    roomNames[nextI], 
+                    posB,
+                    triggerA, 
+                    triggerB,
+                    door.dir, 
+                    S, 
+                    height,
+                    door.axis
                 ));
             }
         }

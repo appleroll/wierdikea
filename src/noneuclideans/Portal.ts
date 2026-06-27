@@ -10,12 +10,20 @@ export class Portal {
     public triggerB: number;
     public dirAtoB: -1 | 1;
     public width: number;
+    public height: number // = 3; the player fits snugly in a 3-unit tunnel, but the ikea door shouldnt be 3 units obv 
     public axis: 'X' | 'Z';
 
     constructor(
-        roomA: string, posA: Vec3, roomB: string, posB: Vec3,
-        triggerA: number, triggerB: number, dirAtoB: -1 | 1, width: number = 4,
-        axis: 'X' | 'Z' = 'Z' // Defaults to Z so it doesn't break your tunnels!
+        roomA: string, 
+        posA: Vec3, 
+        roomB: string, 
+        posB: Vec3,
+        triggerA: number, 
+        triggerB: number, 
+        dirAtoB: -1 | 1, 
+        width: number = 4, 
+        height: number = 3,
+        axis: 'X' | 'Z' = 'Z'
     ) {
         this.roomA = roomA;
         this.posA = posA;
@@ -25,6 +33,7 @@ export class Portal {
         this.triggerB = triggerB;
         this.dirAtoB = dirAtoB;
         this.width = width;
+        this.height = height;
         this.axis = axis;
     }
 

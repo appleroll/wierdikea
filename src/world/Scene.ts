@@ -77,9 +77,9 @@ export class Scene {
             const scaleZ = portal.axis === 'X' ? portal.width : 0.01;
 
             mainModels.push({ 
-                model: Mat4.multiply(Mat4.translation(currentPortalPos), Mat4.scaling([scaleX, 3, scaleZ])), 
+                model: Mat4.multiply(Mat4.translation(currentPortalPos), Mat4.scaling([scaleX, portal.height, scaleZ])), 
                 mult: [1, 1, 1, 1], 
-                portalIndex: index  // <--- This is the crucial link to Engine.ts
+                portalIndex: index
             });
         });
 

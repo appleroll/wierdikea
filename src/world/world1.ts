@@ -1,10 +1,14 @@
+//! COMMENTED CODE IN THIS FILE ARE AI-GENERATED DEMO SCRIPTS
+// They are meant to serve as a reference in case I would need to use similar features in the future
+// We promise that our IKEA is not AI-generated slop, but we can promise that it is human-slop.
+
 import { Scene } from './Scene';
-import { Tunnel } from '../noneuclideans/Tunnel';
+// import { Tunnel } from '../noneuclideans/Tunnel';
 import { TardisBox } from '../noneuclideans/Room'; 
 import { Vec3 } from '../math/Vec3';
 
-const ROOM_B_Z_OFFSET = 7; 
-const ROOM_C_Z_OFFSET = -10; 
+// const ROOM_B_Z_OFFSET = 7; 
+// const ROOM_C_Z_OFFSET = -10; 
 
 export function buildWorld1(init: boolean, existingScene?: Scene): Scene {
     const scene = existingScene || new Scene();
@@ -13,51 +17,51 @@ export function buildWorld1(init: boolean, existingScene?: Scene): Scene {
         // Huge floor
         { pos: [0, -0.5, 10] as Vec3, scale: [500, 1, 500] as Vec3, mult: [0.2, 1, 0.2, 1], room: 'Null' },
 
-        /// TUNNEL 1 REFERENCE BLOCKS
-        { pos: [0, 0.5, -15] as Vec3, scale: [1, 2, 1] as Vec3, mult: [0.8, 0.2, 0.2, 1], room: 'Null' },
-        { pos: [0, 0.5, 5] as Vec3, scale: [1, 2, 1] as Vec3, mult: [0.8, 0.2, 0.2, 1], room: 'Null' },
+        // /// TUNNEL 1 REFERENCE BLOCKS
+        // { pos: [0, 0.5, -15] as Vec3, scale: [1, 2, 1] as Vec3, mult: [0.8, 0.2, 0.2, 1], room: 'Null' },
+        // { pos: [0, 0.5, 5] as Vec3, scale: [1, 2, 1] as Vec3, mult: [0.8, 0.2, 0.2, 1], room: 'Null' },
 
-        /// TUNNEL 2 REFERENCE BLOCKS
-        { pos: [15, 0.5, -15] as Vec3, scale: [1, 2, 1] as Vec3, mult: [0.8, 0.2, 0.2, 1], room: 'Null' },
-        { pos: [15, 0.5, 5] as Vec3, scale: [1, 2, 1] as Vec3, mult: [0.8, 0.2, 0.2, 1], room: 'Null' }        
+        // /// TUNNEL 2 REFERENCE BLOCKS
+        // { pos: [15, 0.5, -15] as Vec3, scale: [1, 2, 1] as Vec3, mult: [0.8, 0.2, 0.2, 1], room: 'Null' },
+        // { pos: [15, 0.5, 5] as Vec3, scale: [1, 2, 1] as Vec3, mult: [0.8, 0.2, 0.2, 1], room: 'Null' }        
     ];
 
-    // Restored your original Tunnel 1
-    const secretTunnel = new Tunnel({
-        mainRoom: 'A',
-        tunnelRoom: 'B',
-        startPos: [0, 1.5, 0],         
-        endPos: [0, 1.5, -10],         
-        hiddenOffset: [100, 1.5, 0],   
-        width: 4,                      
-        height: 3,                  
-        length: 3,                     
-        wallThickness: 0.2,
-        color: [0.2, 0.1, 0.1, 1] 
-    });
+    // // Restored your original Tunnel 1
+    // const secretTunnel = new Tunnel({
+    //     mainRoom: 'A',
+    //     tunnelRoom: 'B',
+    //     startPos: [0, 1.5, 0],         
+    //     endPos: [0, 1.5, -10],         
+    //     hiddenOffset: [100, 1.5, 0],   
+    //     width: 4,                      
+    //     height: 3,                  
+    //     length: 3,                     
+    //     wallThickness: 0.2,
+    //     color: [0.2, 0.1, 0.1, 1] 
+    // });
 
-    // Restored your original Tunnel 2
-    const secretTunnel2 = new Tunnel({
-        mainRoom: 'A',
-        tunnelRoom: 'C',
-        startPos: [15, 1.5, 0],         
-        endPos: [15, 1.5, -10],         
-        hiddenOffset: [115, 1.5, 0],   
-        width: 4,                      
-        height: 3,                  
-        length: 20,                     
-        wallThickness: 0.2,
-        color: [0.2, 0.1, 0.1, 1] 
-    });
+    // // Restored your original Tunnel 2
+    // const secretTunnel2 = new Tunnel({
+    //     mainRoom: 'A',
+    //     tunnelRoom: 'C',
+    //     startPos: [15, 1.5, 0],         
+    //     endPos: [15, 1.5, -10],         
+    //     hiddenOffset: [115, 1.5, 0],   
+    //     width: 4,                      
+    //     height: 3,                  
+    //     length: 20,                     
+    //     wallThickness: 0.2,
+    //     color: [0.2, 0.1, 0.1, 1] 
+    // });
 
     // --- THE 8-ROOM HYPERCUBE ---
     const hyperBox = new TardisBox({
         mainRoom: 'A',
         roomNames: ['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8'],
-        centerPos: [-15, 1.5, -5], // Center of the 2x2 grid
-        quadrantSize: 4,           // Each inner quadrant is 4x4
-        height: 3,
-        
+        centerPos: [-15, 6.5, -5],
+        quadrantSize: 16,
+        height: 13,
+        exteriorColor: [0.4, 0.4, 0.4, 1],
         // Push the 8 virtual rooms far away so they don't overlap
         hiddenOffsets: [
             [-100, 0, 0],   // Q1
@@ -69,17 +73,17 @@ export function buildWorld1(init: boolean, existingScene?: Scene): Scene {
             [-100, 0, -120],// Q7
             [-100, 0, -140] // Q8
         ],
-        
-        // A rainbow loop so you can clearly see the transitions!
+
+        // just make em all blue for now, bc ikea
         colors: [
-            [1.0, 0.2, 0.2, 1], // 1. Red 
-            [1.0, 0.6, 0.1, 1], // 2. Orange 
-            [1.0, 1.0, 0.2, 1], // 3. Yellow
-            [0.2, 1.0, 0.2, 1], // 4. Green 
-            [0.2, 1.0, 1.0, 1], // 5. Cyan
-            [0.2, 0.2, 1.0, 1], // 6. Blue
-            [0.6, 0.2, 1.0, 1], // 7. Purple
-            [1.0, 0.2, 0.6, 1]  // 8. Pink
+        [0.95, 0.95, 0.95, 1], // Q1 floor/walls
+        [0.95, 0.95, 0.95, 1],
+        [0.95, 0.95, 0.95, 1],
+        [0.95, 0.95, 0.95, 1],
+        [0.95, 0.95, 0.95, 1],
+        [0.95, 0.95, 0.95, 1],
+        [0.95, 0.95, 0.95, 1],
+        [0.95, 0.95, 0.95, 1]
         ]
     });
 
@@ -87,31 +91,31 @@ export function buildWorld1(init: boolean, existingScene?: Scene): Scene {
         // 1. Build Room A
         worldGeometry.forEach(b => scene.addBox({ ...b, room: 'A' }));
 
-        // 2. Build Room B (Compresses space)
-        worldGeometry.forEach(b => {
-            const zOffset = b.pos[2] > -5 ? 0 : ROOM_B_Z_OFFSET;
-            scene.addBox({
-                pos: [b.pos[0] + 100, b.pos[1], b.pos[2] + zOffset] as Vec3,
-                scale: b.scale, 
-                mult: b.mult, 
-                room: 'B'
-            });
-        });
+        // // 2. Build Room B (Compresses space)
+        // worldGeometry.forEach(b => {
+        //     const zOffset = b.pos[2] > -5 ? 0 : ROOM_B_Z_OFFSET;
+        //     scene.addBox({
+        //         pos: [b.pos[0] + 100, b.pos[1], b.pos[2] + zOffset] as Vec3,
+        //         scale: b.scale, 
+        //         mult: b.mult, 
+        //         room: 'B'
+        //     });
+        // });
 
-        // 3. Build Room C
-        worldGeometry.forEach(b => {
-            const zOffset = b.pos[2] > -5 ? 0 : ROOM_C_Z_OFFSET;
-            scene.addBox({
-                pos: [b.pos[0] + 115, b.pos[1], b.pos[2] + zOffset] as Vec3,
-                scale: b.scale, 
-                mult: b.mult, 
-                room: 'C'
-            });
-        });
+        // // 3. Build Room C
+        // worldGeometry.forEach(b => {
+        //     const zOffset = b.pos[2] > -5 ? 0 : ROOM_C_Z_OFFSET;
+        //     scene.addBox({
+        //         pos: [b.pos[0] + 115, b.pos[1], b.pos[2] + zOffset] as Vec3,
+        //         scale: b.scale, 
+        //         mult: b.mult, 
+        //         room: 'C'
+        //     });
+        // });
     }
 
-    secretTunnel.addToScene(scene, init);
-    secretTunnel2.addToScene(scene, init);
+    // secretTunnel.addToScene(scene, init);
+    // secretTunnel2.addToScene(scene, init);
     hyperBox.addToScene(scene, init); 
     
     return scene;
