@@ -3,6 +3,7 @@ import { Mat4 } from './math/Mat4';
 import { InputManager } from './input/InputManager';
 import { Camera } from './world/Camera';
 import { buildWorld1 } from './world/world1';
+import {loadSound, playLoop} from './audio/Audio';
 
 async function main() {
     const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
@@ -17,7 +18,10 @@ async function main() {
     
     const scene = buildWorld1(true);
 
-    // Keep an array of render targets instead of just one
+    const ikeaAmbience = await loadSound("IKEATUNE.wav");
+    playLoop(ikeaAmbience);
+
+
     let portalTargets: { texture: GPUTexture, view: GPUTextureView }[] = [];
 
     window.addEventListener('resize', () => {
