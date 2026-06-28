@@ -26,3 +26,5 @@ dist-ssr
 
 # Just ignore Audacity project files for now
 *.aup3
+*.aup3-shm
+*.aup3-wal
