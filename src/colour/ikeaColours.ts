@@ -4,6 +4,9 @@ export const ikeaColours = {
 
     // theoretical white, in reality its slightly greyer
     white: RGBTodRGB(250, 250, 250, 1),
+
+    // concrete
+    concrete: RGBTodRGB(200, 200, 200, 1),
 };
 
 function RGBTodRGB(r: number, g: number, b: number, a: number): [number, number, number, number] {

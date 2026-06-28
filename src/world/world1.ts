@@ -7,6 +7,7 @@ import { Scene } from './Scene';
 import { IKEAShell } from '../noneuclideans/Room'; 
 import { Vec3 } from '../math/Vec3';
 import { ikeaColours } from '../colour/ikeaColours';
+import { addShelf } from './Shelving';
 
 // const ROOM_B_Z_OFFSET = 7; 
 // const ROOM_C_Z_OFFSET = -10; 
@@ -55,7 +56,7 @@ export function buildWorld1(init: boolean, existingScene?: Scene): Scene {
     //     color: [0.2, 0.1, 0.1, 1] 
     // });
 
-    // --- THE 8-ROOM HYPERCUBE ---
+    // ?landmark ?bookmark Outer IKEA Shell
     const hyperBox = new IKEAShell({
         mainRoom: 'A',
         roomNames: ['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8'],
@@ -88,8 +89,53 @@ export function buildWorld1(init: boolean, existingScene?: Scene): Scene {
     });
 
     if (init) {
-        // 1. Build Room A
+        // Build Room A
         worldGeometry.forEach(b => scene.addBox({ ...b, room: 'A' }));
+
+        // ?bookmark ?landmark Storage Self Serve Area No 2 (Q7)
+        // ?landmark first row, nearest to yellow entrance
+        addShelf(scene, -87, 1, -153, "Q7", 4, 3, 1);
+        addShelf(scene, -92, 1, -153, "Q7", 4, 3, 1);
+        addShelf(scene, -97, 1, -153, "Q7", 4, 3, 1);
+
+        addShelf(scene, -87, 1, -157, "Q7", 4, 3, 1);
+        addShelf(scene, -92, 1, -157, "Q7", 4, 3, 1);
+        addShelf(scene, -97, 1, -157, "Q7", 4, 3, 1);
+
+        // ?landmark second row, opposite first row in Q7
+        addShelf(scene, -87, 1, -167, "Q7", 4, 3, 1);
+        addShelf(scene, -92, 1, -167, "Q7", 4, 3, 1);
+        addShelf(scene, -97, 1, -167, "Q7", 4, 3, 1);
+
+        addShelf(scene, -87, 1, -171, "Q7", 4, 3, 1);
+        addShelf(scene, -92, 1, -171, "Q7", 4, 3, 1);
+        addShelf(scene, -97, 1, -171, "Q7", 4, 3, 1);
+
+        addShelf(scene, -82, 1, -171, "Q7", 4, 3, 1);
+        addShelf(scene, -77, 1, -171, "Q7", 4, 3, 1);
+
+        addShelf(scene, -82, 1, -167, "Q7", 4, 3, 1);
+        addShelf(scene, -77, 1, -167, "Q7", 4, 3, 1);  
+
+        // ?bookmark ?landmark Storage Self Serve Area No 1 (Q6)
+        // ?landmark first row, nearest to yellow entrance
+        addShelf(scene, -102, 1, -147, "Q6", 4, 3, 1);
+        addShelf(scene, -107, 1, -147, "Q6", 4, 3, 1);
+        addShelf(scene, -112, 1, -147, "Q6", 4, 3, 1);
+
+        addShelf(scene, -102, 1, -151, "Q6", 4, 3, 1);
+        addShelf(scene, -107, 1, -151, "Q6", 4, 3, 1);
+        addShelf(scene, -112, 1, -151, "Q6", 4, 3, 1);
+
+        // ?landmark second row, opposite first row in Q6
+        addShelf(scene, -102, 1, -133, "Q6", 4, 3, 1);
+        addShelf(scene, -107, 1, -133, "Q6", 4, 3, 1);
+        addShelf(scene, -112, 1, -133, "Q6", 4, 3, 1);
+
+        addShelf(scene, -102, 1, -137, "Q6", 4, 3, 1);
+        addShelf(scene, -107, 1, -137, "Q6", 4, 3, 1);
+        addShelf(scene, -112, 1, -137, "Q6", 4, 3, 1);
+
 
         // // 2. Build Room B (Compresses space)
         // worldGeometry.forEach(b => {

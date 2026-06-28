@@ -31,6 +31,7 @@ export class Camera {
 
         // Keyboard movement
         if (input.isKeyDown('w')) this.pos = Vec3.sub(this.pos, Vec3.mul(moveFwd, dt * 5));
+        if (input.isKeyDown('q')) this.pos = Vec3.sub(this.pos, Vec3.mul(moveFwd, dt * 7));
         if (input.isKeyDown('s')) this.pos = Vec3.add(this.pos, Vec3.mul(moveFwd, dt * 5));
         if (input.isKeyDown('a')) this.pos = Vec3.sub(this.pos, Vec3.mul(right, dt * 5));
         if (input.isKeyDown('d')) this.pos = Vec3.add(this.pos, Vec3.mul(right, dt * 5));

@@ -55,8 +55,14 @@ export class IKEAShell {
             const vz = qz + offset[2];
 
             // Floor & Ceiling for this quadrant
-            scene.addBox({ pos: [vx, vy - height/2, vz], scale: [S, T, S], mult: color, room: room });
-            scene.addBox({ pos: [vx, vy + height/2, vz], scale: [S, T, S], mult: color, room: room });
+            if (room !== "Q6" && room !== "Q7") { // Q6 and Q7 are storage areas, so they should be concrete
+
+                scene.addBox({ pos: [vx, vy - height/2, vz], scale: [S, T, S], mult: color, room: room });
+                scene.addBox({ pos: [vx, vy + height/2, vz], scale: [S, T, S], mult: color, room: room });
+            } else {
+            scene.addBox({ pos: [vx, vy - height/2, vz], scale: [S, T, S], mult: ikeaColours.concrete, room: room });
+            scene.addBox({ pos: [vx, vy + height/2, vz], scale: [S, T, S], mult: ikeaColours.concrete, room: room });
+            }
 
             // here we add another ceiling bc ikea is split into different floors, and lets just make it so IKEA is on the ground floor
             // here we pose some questions
@@ -107,7 +113,6 @@ export class IKEAShell {
             // if (quadIdx === 3 || quadIdx === 0) { // SE or SW: Add South partition wall
             //     scene.addBox({ pos: [cx + offset[0], vy, cz + S/2 + offset[2]], scale: [S, height, T], mult: color, room: room });
             // }
-// Half partition walls (hide portal transitions)
 
 // Q1 (SW)
 if (quadIdx === 0) {
@@ -130,13 +135,13 @@ if (quadIdx === 0) {
 
 // Q2 (NW)
 if (quadIdx === 1) {
-    // Vertical wall: pillar -> north
-    scene.addBox({
-        pos: [cx + offset[0], vy, cz - S / 4 + offset[2]],
-        scale: [T, height, S / 2],
-        mult: color,
-        room: room
-    });
+    // // Vertical wall: pillar -> north
+    // scene.addBox({
+    //     pos: [cx + offset[0], vy, cz - S / 4 + offset[2]],
+    //     scale: [T, height, S / 2],
+    //     mult: color,
+    //     room: room
+    // });
 
     // Horizontal wall: pillar -> west
     scene.addBox({
@@ -147,15 +152,15 @@ if (quadIdx === 1) {
     });
 }
 
-// Q3 (NE)
+// // Q3 (NE)
 if (quadIdx === 2) {
-    // Vertical wall: pillar -> north
-    scene.addBox({
-        pos: [cx + offset[0], vy, cz - S / 4 + offset[2]],
-        scale: [T, height, S / 2],
-        mult: color,
-        room: room
-    });
+    // // // Vertical wall: pillar -> north
+    // scene.addBox({
+    //     pos: [cx + offset[0], vy, cz - S / 4 + offset[2]],
+    //     scale: [T, height, S / 2],
+    //     mult: color,
+    //     room: room
+    // });
 
     // Horizontal wall: pillar -> east
     scene.addBox({
