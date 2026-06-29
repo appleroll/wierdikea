@@ -32,12 +32,9 @@ export class Engine {
         this.device = await adapter!.requestDevice();
         this.context = this.canvas.getContext('webgpu') as GPUCanvasContext;
         this.format = navigator.gpu.getPreferredCanvasFormat();
-
         this.context.configure({ device: this.device, format: this.format, alphaMode: 'premultiplied' });
 
-
         const shaderModule = this.device.createShaderModule({ code: wgsl });
-
         this.pipeline = this.device.createRenderPipeline({
             layout: 'auto',
             vertex: {
@@ -118,65 +115,63 @@ export class Engine {
         this.depthTextureView = this.depthTexture.createView();
     }
 
-render(
-        projMatrix: Float32Array, 
-        viewMatrix: Float32Array, 
-        models: {model: Float32Array, mult: number[], portalIndex?: number}[], 
-        targetView?: GPUTextureView, 
-        portalViews?: GPUTextureView[] // <--- Now accepts an array of textures
-    ) {
-        if (!this.device) return;
+    render(
+            projMatrix: Float32Array, 
+            viewMatrix: Float32Array, 
+            models: {model: Float32Array, mult: number[], portalIndex?: number}[], 
+            targetView?: GPUTextureView, 
+            portalViews?: GPUTextureView[]
+        ) {
+            if (!this.device) return;
 
-        const viewProj = Mat4.multiply(projMatrix, viewMatrix);
-        this.device.queue.writeBuffer(this.cameraUniformBuffer, 0, viewProj);
+            const viewProj = Mat4.multiply(projMatrix, viewMatrix);
+            this.device.queue.writeBuffer(this.cameraUniformBuffer, 0, viewProj);
 
-        const commandEncoder = this.device.createCommandEncoder();
-        const pass = commandEncoder.beginRenderPass({
-            colorAttachments: [{
-                view: targetView || this.context.getCurrentTexture().createView(),
-                clearValue: { r: 0.1, g: 0.5, b: 1, a: 1.0 },
-                loadOp: 'clear', storeOp: 'store'
-            }],
-            depthStencilAttachment: { view: this.depthTextureView, depthClearValue: 1.0, depthLoadOp: 'clear', depthStoreOp: 'store' }
-        });
+            const commandEncoder = this.device.createCommandEncoder();
+            const pass = commandEncoder.beginRenderPass({
+                colorAttachments: [{
+                    view: targetView || this.context.getCurrentTexture().createView(),
+                    clearValue: { r: 0.1, g: 0.5, b: 1, a: 1.0 },
+                    loadOp: 'clear', storeOp: 'store'
+                }],
+                depthStencilAttachment: { view: this.depthTextureView, depthClearValue: 1.0, depthLoadOp: 'clear', depthStoreOp: 'store' }
+            });
 
-        pass.setPipeline(this.pipeline);
-        pass.setBindGroup(0, this.cameraBindGroup);
-        pass.setVertexBuffer(0, this.vertexBuffer);
-        pass.setVertexBuffer(1, this.colorBuffer);
+            pass.setPipeline(this.pipeline);
+            pass.setBindGroup(0, this.cameraBindGroup);
+            pass.setVertexBuffer(0, this.vertexBuffer);
+            pass.setVertexBuffer(1, this.colorBuffer);
 
-        // 1. Pre-create a bind group for every active portal texture
-        const pBindGroups = (portalViews || []).map(view => 
-            this.device.createBindGroup({
+            const pBindGroups = (portalViews || []).map(view => 
+                this.device.createBindGroup({
+                    layout: this.pipeline.getBindGroupLayout(2),
+                    entries: [{ binding: 0, resource: view }]
+                })
+            );
+            
+            const dummyPBindGroup = this.device.createBindGroup({
                 layout: this.pipeline.getBindGroupLayout(2),
-                entries: [{ binding: 0, resource: view }]
-            })
-        );
-        
-        const dummyPBindGroup = this.device.createBindGroup({
-            layout: this.pipeline.getBindGroupLayout(2),
-            entries: [{ binding: 0, resource: this.dummyTextureView }]
-        });
+                entries: [{ binding: 0, resource: this.dummyTextureView }]
+            });
 
-        models.forEach((box, i) => {
-            let cache = this.modelBindGroups.get(i.toString());
-            if (!cache) {
-                const buffer = this.device.createBuffer({
-                    size: 96,
-                    usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
-                });
-                const bindGroup = this.device.createBindGroup({
-                    layout: this.pipeline.getBindGroupLayout(1),
-                    entries: [{ binding: 0, resource: { buffer } }]
-                });
-                cache = { buffer, bindGroup };
-                this.modelBindGroups.set(i.toString(), cache);
+            models.forEach((box, i) => {
+                let cache = this.modelBindGroups.get(i.toString());
+                if (!cache) {
+                    const buffer = this.device.createBuffer({
+                        size: 96,
+                        usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
+                    });
+                    const bindGroup = this.device.createBindGroup({
+                        layout: this.pipeline.getBindGroupLayout(1),
+                        entries: [{ binding: 0, resource: { buffer } }]
+                    });
+                    cache = { buffer, bindGroup };
+                    this.modelBindGroups.set(i.toString(), cache);
             }
 
             this.device.queue.writeBuffer(cache.buffer, 0, box.model);
             this.device.queue.writeBuffer(cache.buffer, 64, new Float32Array(box.mult));
             
-            // 2. Dynamically bind the correct texture right before drawing this specific mesh
             if (box.portalIndex !== undefined && box.portalIndex >= 0 && box.portalIndex < pBindGroups.length) {
                 this.device.queue.writeBuffer(cache.buffer, 80, new Float32Array([1, 0, 0, 0])); // isPortal = true
                 pass.setBindGroup(2, pBindGroups[box.portalIndex]);

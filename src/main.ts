@@ -18,7 +18,6 @@ async function main() {
     
     const scene = buildWorld1(true);
 
-
     let portalTargets: { texture: GPUTexture, view: GPUTextureView }[] = [];
 
     window.addEventListener('resize', () => {
@@ -70,11 +69,10 @@ async function main() {
             }
         });
     }
-
     requestAnimationFrame(loop);
 }
 
 requestAnimationFrame(loop);
-    }
+}
 
 main().catch(console.error);

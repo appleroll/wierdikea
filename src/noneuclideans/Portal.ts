@@ -40,7 +40,6 @@ export class Portal {
     checkCrossing(camera: Camera, currentRoom: string): string | null {
         // If axis is X, we check index 0. If Z, we check index 2.
         const axisIdx = this.axis === 'X' ? 0 : 2;
-        // The bounding width is evaluated on the perpendicular axis
         const crossIdx = this.axis === 'X' ? 2 : 0; 
 
         if (currentRoom === this.roomA) {

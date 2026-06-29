@@ -60,8 +60,8 @@ export class IKEAShell {
                 scene.addBox({ pos: [vx, vy - height/2, vz], scale: [S, T, S], mult: color, room: room });
                 scene.addBox({ pos: [vx, vy + height/2, vz], scale: [S, T, S], mult: color, room: room });
             } else {
-            scene.addBox({ pos: [vx, vy - height/2, vz], scale: [S, T, S], mult: ikeaColours.concrete, room: room });
-            scene.addBox({ pos: [vx, vy + height/2, vz], scale: [S, T, S], mult: ikeaColours.concrete, room: room });
+                scene.addBox({ pos: [vx, vy - height/2, vz], scale: [S, T, S], mult: ikeaColours.concrete, room: room });
+                scene.addBox({ pos: [vx, vy + height/2, vz], scale: [S, T, S], mult: ikeaColours.concrete, room: room });
             }
 
             // here we add another ceiling bc ikea is split into different floors, and lets just make it so IKEA is on the ground floor
@@ -98,102 +98,91 @@ export class IKEAShell {
                 scene.addBox({ pos: [vx, vy, vz + S/2], scale: [S, height, T], mult: color, room: room });
             }
 
-            // Always add the central pillar partition blocker
             scene.addBox({ pos: [cx + offset[0], vy, cz + offset[2]], scale: [0.4, height, 0.4], mult: color, room: room });
-            // add walls partitioning the quadrants
-            // if (quadIdx === 0 || quadIdx === 1) { // SW or NW: Add West partition wall
-            //     scene.addBox({ pos: [cx - S/2 + offset[0], vy, cz + offset[2]], scale: [T, height, S], mult: color, room: room });
-            // }
-            // if (quadIdx === 1 || quadIdx === 2) { // NW or NE: Add North partition wall
-            //     scene.addBox({ pos: [cx + offset[0], vy, cz - S/2 + offset[2]], scale: [S, height, T], mult: color, room: room });
-            // }
-            // if (quadIdx === 2 || quadIdx === 3) { // NE or SE: Add East partition wall
-            //     scene.addBox({ pos: [cx + S/2 + offset[0], vy, cz + offset[2]], scale: [T, height, S], mult: color, room: room });
-            // }
-            // if (quadIdx === 3 || quadIdx === 0) { // SE or SW: Add South partition wall
-            //     scene.addBox({ pos: [cx + offset[0], vy, cz + S/2 + offset[2]], scale: [S, height, T], mult: color, room: room });
-            // }
 
-// Q1 (SW)
-if (quadIdx === 0) {
-    // Vertical wall: pillar -> south
-    scene.addBox({
-        pos: [cx + offset[0], vy, cz + S / 4 + offset[2]],
-        scale: [T, height, S / 2],
-        mult: color,
-        room: room
-    });
+            // ?landmark ?bookmark Add the inner walls that partition the quadrants
+            // Q1 (SW)
+            if (quadIdx === 0) {
+                // Vertical wall: pillar -> south
+                scene.addBox({
+                    pos: [cx + offset[0], vy, cz + S / 4 + offset[2]],
+                    scale: [T, height, S / 2],
+                    mult: color,
+                    room: room
+                });
 
-    // Horizontal wall: pillar -> west
-    scene.addBox({
-        pos: [cx - S / 4 + offset[0], vy, cz + offset[2]],
-        scale: [S / 2, height, T],
-        mult: color,
-        room: room
-    });
+                // Horizontal wall: pillar -> west
+                scene.addBox({
+                    pos: [cx - S / 4 + offset[0], vy, cz + offset[2]],
+                    scale: [S / 2, height, T],
+                    mult: color,
+                    room: room
+                });
+            }
+
+            // Q2 (NW)
+            if (quadIdx === 1) {
+                // // Vertical wall: pillar -> north
+                // ?note Removed wall to fit IKEA storage bay
+                // scene.addBox({
+                //     pos: [cx + offset[0], vy, cz - S / 4 + offset[2]],
+                //     scale: [T, height, S / 2],
+                //     mult: color,
+                //     room: room
+                // });
+
+                // Horizontal wall: pillar -> west
+                scene.addBox({
+                    pos: [cx - S / 4 + offset[0], vy, cz + offset[2]],
+                    scale: [S / 2, height, T],
+                    mult: color,
+                    room: room
+                });
+            }
+
+            // // Q3 (NE)
+            if (quadIdx === 2) {
+                // // // Vertical wall: pillar -> north
+                // ?note Removed wall to fit the IKEA storage bay
+                // scene.addBox({
+                //     pos: [cx + offset[0], vy, cz - S / 4 + offset[2]],
+                //     scale: [T, height, S / 2],
+                //     mult: color,
+                //     room: room
+                // });
+
+                // Horizontal wall: pillar -> east
+                scene.addBox({
+                    pos: [cx + S / 4 + offset[0], vy, cz + offset[2]],
+                    scale: [S / 2, height, T],
+                    mult: color,
+                    room: room
+                });
+            }
+
+            // Q4 (SE)
+            if (quadIdx === 3) {
+                // Vertical wall: pillar -> south
+                scene.addBox({
+                    pos: [cx + offset[0], vy, cz + S / 4 + offset[2]],
+                    scale: [T, height, S / 2],
+                    mult: color,
+                    room: room
+                });
+
+                // Horizontal wall: pillar -> east
+                scene.addBox({
+                    pos: [cx + S / 4 + offset[0], vy, cz + offset[2]],
+                    scale: [S / 2, height, T],
+                    mult: color,
+                    room: room
+                });
+            }
 }
-
-// Q2 (NW)
-if (quadIdx === 1) {
-    // // Vertical wall: pillar -> north
-    // scene.addBox({
-    //     pos: [cx + offset[0], vy, cz - S / 4 + offset[2]],
-    //     scale: [T, height, S / 2],
-    //     mult: color,
-    //     room: room
-    // });
-
-    // Horizontal wall: pillar -> west
-    scene.addBox({
-        pos: [cx - S / 4 + offset[0], vy, cz + offset[2]],
-        scale: [S / 2, height, T],
-        mult: color,
-        room: room
-    });
-}
-
-// // Q3 (NE)
-if (quadIdx === 2) {
-    // // // Vertical wall: pillar -> north
-    // scene.addBox({
-    //     pos: [cx + offset[0], vy, cz - S / 4 + offset[2]],
-    //     scale: [T, height, S / 2],
-    //     mult: color,
-    //     room: room
-    // });
-
-    // Horizontal wall: pillar -> east
-    scene.addBox({
-        pos: [cx + S / 4 + offset[0], vy, cz + offset[2]],
-        scale: [S / 2, height, T],
-        mult: color,
-        room: room
-    });
-}
-
-// Q4 (SE)
-if (quadIdx === 3) {
-    // Vertical wall: pillar -> south
-    scene.addBox({
-        pos: [cx + offset[0], vy, cz + S / 4 + offset[2]],
-        scale: [T, height, S / 2],
-        mult: color,
-        room: room
-    });
-
-    // Horizontal wall: pillar -> east
-    scene.addBox({
-        pos: [cx + S / 4 + offset[0], vy, cz + offset[2]],
-        scale: [S / 2, height, T],
-        mult: color,
-        room: room
-    });
-}
-
-        }
 
         if (init) {
-            // Entrance: Main Room -> Room 0 (Entering the SW quadrant from the South)
+            // ?landmark ?bookmark Add the portal that connects the main room to the first quadrant (Q1)
+            // ie. the entrance portal
             const entrancePhysical: Vec3 = [cx - S/2, cy, cz + S];
             const entranceVirtual: Vec3 = [cx - S/2 + hiddenOffsets[0][0], cy, cz + S + hiddenOffsets[0][2]];
             
@@ -212,10 +201,10 @@ if (quadIdx === 3) {
 
             // The doorways that connect the quadrants (Clockwise)
             const doorways = [
-                { axis: 'Z' as const, dir: -1 as const, pos: [-S/2, 0] }, // SW -> NW (Cross Z axis)
-                { axis: 'X' as const, dir:  1 as const, pos: [0, -S/2] }, // NW -> NE (Cross X axis)
-                { axis: 'Z' as const, dir:  1 as const, pos: [S/2, 0] },  // NE -> SE (Cross Z axis)
-                { axis: 'X' as const, dir: -1 as const, pos: [0, S/2] }   // SE -> SW (Cross X axis)
+                { axis: 'Z' as const, dir: -1 as const, pos: [-S/2, 0] }, // SW -> NW
+                { axis: 'X' as const, dir:  1 as const, pos: [0, -S/2] }, // NW -> NE
+                { axis: 'Z' as const, dir:  1 as const, pos: [S/2, 0] },  // NE -> SE
+                { axis: 'X' as const, dir: -1 as const, pos: [0, S/2] }   // SE -> SW
             ];
 
             // Connect Room i to Room i+1

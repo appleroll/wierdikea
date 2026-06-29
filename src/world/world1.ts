@@ -1,6 +1,5 @@
 //! COMMENTED CODE IN THIS FILE ARE AI-GENERATED DEMO SCRIPTS
 // They are meant to serve as a reference in case I would need to use similar features in the future
-// We promise that our IKEA is not AI-generated slop, but we can promise that it is human-slop.
 
 import { Scene } from './Scene';
 // import { Tunnel } from '../noneuclideans/Tunnel';

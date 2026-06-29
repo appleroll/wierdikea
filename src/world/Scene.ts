@@ -39,12 +39,11 @@ export class Scene {
 
         // Recursive function to explore rooms from the inside out
         const buildRoom = (room: string, camPos: Vec3, depth: number, incomingPortal?: Portal): number => {
-            if (depth === 0) return -1; // -1 means we hit the depth limit
+            if (depth === 0) return -1; // means we hit the depth limit
 
             const models: any[] = [];
             const activePortals = this.portals.filter(p => p.roomA === room || p.roomB === room);
 
-            // 1. Add standard room geometry
             this.boxes.filter(b => b.room === room).forEach(b => {
                 models.push({ 
                     model: Mat4.multiply(Mat4.translation(b.pos), Mat4.scaling(b.scale)), 
@@ -52,10 +51,8 @@ export class Scene {
                 });
             });
 
-            // 2. Process inner portals
             activePortals.forEach(portal => {
-                // Prevent infinite loops by not looking back through the portal we just came from
-                if (portal === incomingPortal) return; 
+                if (portal === incomingPortal) return; // Prevent infinite loops by not looking back through the portal we just came from
 
                 const isRoomA = room === portal.roomA;
                 const currentPos = isRoomA ? portal.posA : portal.posB;
@@ -79,20 +76,18 @@ export class Scene {
                 }
             });
 
-            // 3. Create the Job
+            // If we are at the top level (no incoming portal), we render the main view. Otherwise, we render to a texture for the portal.
             if (!incomingPortal) {
-                // If there's no incoming portal, this is the MAIN room (renders direct to canvas)
                 jobs.push({ isMain: true, view: camera.getViewMatrix(), models });
                 return -1;
             } else {
-                // This is a VIRTUAL room (renders to a texture)
                 const myTextureIndex = textureCount++;
                 jobs.push({ isMain: false, targetIndex: myTextureIndex, view: camera.getVirtualViewMatrix(camPos), models });
                 return myTextureIndex;
             }
         };
 
-        // Kick off the recursion from the room the player is standing in
+        // Start building the scene from the active room
         buildRoom(this.activeRoom, camera.pos, maxDepth, undefined);
 
         return { jobs, totalTextures: textureCount };

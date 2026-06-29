@@ -31,7 +31,7 @@ fn vs_main(in: VertexInput) -> VertexOutput {
 
 @fragment
 fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
-    // If it's a portal, sample the offscreen texture using screen pixels!
+    // If it's a portal, sample the offscreen texture using screen pixels
     if (modelParams.portalData.x > 0.5) {
         return textureLoad(portalTex, vec2<i32>(in.position.xy), 0);
     }

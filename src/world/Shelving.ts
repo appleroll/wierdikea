@@ -9,7 +9,7 @@ export function addShelf(
     room: string,
     width = 3,
     depth = 4,
-    rotation = 0, // 0, 1, 2, 3 = 0°, 90°, 180°, 270°
+    rotation = 0, // 0, 1, 2, 3 = 0°, 90°, 180°, 270° respectively
     shelfColor = ikeaColours.white
 ) {
     const T = 0.15;

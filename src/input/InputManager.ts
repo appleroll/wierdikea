@@ -24,7 +24,6 @@ export class InputManager {
         return this.keys.has(key);
     }
 
-    // Fetches the mouse delta and resets it so it doesn't infinitely scroll
     getMouseDelta() {
         const mx = this.movementX;
         const my = this.movementY;
