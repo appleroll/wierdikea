@@ -19,7 +19,6 @@ export class Engine {
 
     modelBindGroups: Map<string, { buffer: GPUBuffer, bindGroup: GPUBindGroup }> = new Map();
     
-    // Default texture for non-portal objects so WebGPU doesn't crash expecting a binding
     dummyTextureView!: GPUTextureView; 
 
     constructor(canvas: HTMLCanvasElement) {
@@ -87,14 +86,14 @@ export class Engine {
             -0.5, -0.5, -0.5,  -0.5, -0.5,  0.5,  -0.5,  0.5,  0.5,  -0.5, -0.5, -0.5,  -0.5,  0.5,  0.5,  -0.5,  0.5, -0.5,
         ]);
 
-const faceColors = [
-    [0.7, 0.7, 0.7, 1.0], // Front
-    [0.7, 0.7, 0.7, 1.0], // Back
-    [0.5, 0.5, 0.5, 1.0], // Top
-    [0.5, 0.5, 0.5, 1.0], // Bottom
-    [0.8, 0.8, 0.8, 1.0], // Right
-    [0.8, 0.8, 0.8, 1.0], // Left
-];
+        const faceColors = [
+            [0.7, 0.7, 0.7, 1.0], // Front
+            [0.7, 0.7, 0.7, 1.0], // Back
+            [0.5, 0.5, 0.5, 1.0], // Top
+            [0.5, 0.5, 0.5, 1.0], // Bottom
+            [0.8, 0.8, 0.8, 1.0], // Right
+            [0.8, 0.8, 0.8, 1.0], // Left
+        ];
         const colors = new Float32Array(36 * 4);
         for (let j = 0; j < 6; j++) for (let i = 0; i < 6; i++) colors.set(faceColors[j], (j * 6 + i) * 4);
 

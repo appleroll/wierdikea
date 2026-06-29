@@ -11,6 +11,8 @@ export function playLoop(buffer: AudioBuffer, volume = 0.1) {
     source.buffer = buffer;
     source.loop = true;
 
+    volume = parseInt((document.getElementById('volume-slider') as HTMLInputElement).value) / 100;
+
     const gain = audioContext.createGain();
     gain.gain.value = volume; 
 
