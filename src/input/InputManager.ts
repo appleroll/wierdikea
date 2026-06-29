@@ -1,3 +1,4 @@
+import {currentGameState} from "../states/GameState";
 export class InputManager {
     private keys = new Set<string>();
     private movementX = 0;
@@ -10,7 +11,11 @@ export class InputManager {
         window.addEventListener('keydown', e => this.keys.add(e.key.toLowerCase()));
         window.addEventListener('keyup', e => this.keys.delete(e.key.toLowerCase()));
         
-        canvas.addEventListener('click', () => this.canvas.requestPointerLock());
+        canvas.addEventListener('click', () => {
+            if (currentGameState === "playing" && document.pointerLockElement !== this.canvas) {
+                this.canvas.requestPointerLock();
+            }
+        });
         
         document.addEventListener('mousemove', e => {
             if (document.pointerLockElement === this.canvas) {

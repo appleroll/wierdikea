@@ -30,11 +30,32 @@ export class Camera {
         if (moveFwd[0] !== 0 || moveFwd[2] !== 0) moveFwd = Vec3.normalize(moveFwd);
 
         // Keyboard movement
-        if (input.isKeyDown('w')) this.pos = Vec3.sub(this.pos, Vec3.mul(moveFwd, dt * 5));
-        if (input.isKeyDown('q')) this.pos = Vec3.sub(this.pos, Vec3.mul(moveFwd, dt * 7));
-        if (input.isKeyDown('s')) this.pos = Vec3.add(this.pos, Vec3.mul(moveFwd, dt * 5));
-        if (input.isKeyDown('a')) this.pos = Vec3.sub(this.pos, Vec3.mul(right, dt * 5));
-        if (input.isKeyDown('d')) this.pos = Vec3.add(this.pos, Vec3.mul(right, dt * 5));
+        if (input.isKeyDown('shift')) {
+            if (input.isKeyDown('w')) { 
+                this.pos = Vec3.sub(this.pos, Vec3.mul(moveFwd, dt * 7));
+                this.pos[1] = 1.5 + Math.sin(Date.now() * 0.01) * 0.05;
+            }
+            if (input.isKeyDown('s')) this.pos = Vec3.add(this.pos, Vec3.mul(moveFwd, dt * 7));
+            if (input.isKeyDown('a')) this.pos = Vec3.sub(this.pos, Vec3.mul(right, dt * 7));
+            if (input.isKeyDown('d')) this.pos = Vec3.add(this.pos, Vec3.mul(right, dt * 7));
+        } else if (input.isKeyDown('control')) {
+            // debug mode: move faster
+            // ?todo comment out when shipping
+            if (input.isKeyDown('w')) this.pos = Vec3.sub(this.pos, Vec3.mul(moveFwd, dt * 15));
+            if (input.isKeyDown('s')) this.pos = Vec3.add(this.pos, Vec3.mul(moveFwd, dt * 15));
+            if (input.isKeyDown('a')) this.pos = Vec3.sub(this.pos, Vec3.mul(right, dt * 15));
+            if (input.isKeyDown('d')) this.pos = Vec3.add(this.pos, Vec3.mul(right, dt * 15));
+        }
+        else {
+            if (input.isKeyDown('w')) {
+                this.pos = Vec3.sub(this.pos, Vec3.mul(moveFwd, dt * 5));
+                // move player up and down in a sine wave
+                this.pos[1] = 1.5 + Math.sin(Date.now() * 0.01) * 0.05;
+            }
+            if (input.isKeyDown('s')) this.pos = Vec3.add(this.pos, Vec3.mul(moveFwd, dt * 5));
+            if (input.isKeyDown('a')) this.pos = Vec3.sub(this.pos, Vec3.mul(right, dt * 5));
+            if (input.isKeyDown('d')) this.pos = Vec3.add(this.pos, Vec3.mul(right, dt * 5));
+        }
     }
 
     getViewMatrix(): Float32Array {
