@@ -6,6 +6,6 @@ document.getElementById("start")!.onclick = async () => {
     currentGameState = "playing";
     document.getElementById("menu")!.style.display = "none";
 
-    const ikeaAmbience = await loadSound("IKEATUNE.wav");
+    const ikeaAmbience = await loadSound("Local Elevator.mp3");
     playLoop(ikeaAmbience);
 };

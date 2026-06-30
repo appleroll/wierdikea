@@ -31,5 +31,6 @@ For those of you curious, here's how the source code is structured.
 An effort has been made to minimise the amount of AI-generated code in this codebase. While AI is used for certain areas, major versions (eg. versions when shipped on Stardance) are guaranteed to be AI-free. Commits where AI-generated code has been present have been marked with the tag **[AI]**.
 
 
-#### Optional Shopping Theme Credit 
-Shining - Leon Albertson (edited), downloaded off Youtube Studio 27 Jun
+#### Shopping Theme Credit 
+Local Elevator - Kevin Macleod (OG NPC theme)
+Played at 0.8x speed for uncanny vibes.

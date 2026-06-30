@@ -15,6 +15,7 @@ export function playLoop(buffer: AudioBuffer, volume = 0.1) {
 
     const gain = audioContext.createGain();
     gain.gain.value = volume; 
+    source.playbackRate.value = 0.8;
 
     source.connect(gain);
     gain.connect(audioContext.destination);
