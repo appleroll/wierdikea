@@ -33,46 +33,80 @@ async function main() {
     let lastTime = performance.now();
     
     function loop(time: number) {
-    if (currentGameState === "playing") {
-        const dt = (time - lastTime) / 1000;
-        lastTime = time;
+        if (currentGameState === "playing") {
+            const dt = (time - lastTime) / 1000;
+            lastTime = time;
 
-        camera.update(dt, input);
-        scene.updateTeleportation(camera);
+            camera.update(dt, input);
+            scene.updateTeleportation(camera);
 
-        const projMatrix = Mat4.perspective(
-            Math.PI / 3,
-            canvas.width / canvas.height,
-            0.1,
-            100
-        );
+            const projMatrix = Mat4.perspective(
+                Math.PI / 3,
+                canvas.width / canvas.height,
+                0.1,
+                100
+            );
 
-        const { jobs, totalTextures } = scene.getRenderJobs(camera, 4);
+            const { jobs, totalTextures } = scene.getRenderJobs(camera, 4);
 
-        while (portalTargets.length < totalTextures) {
-            portalTargets.push(engine.createRenderTarget(canvas.width, canvas.height));
-        }
-
-        const allTextureViews = portalTargets.map(t => t.view);
-
-        jobs.forEach((job: any) => {
-            if (job.isMain) {
-                engine.render(projMatrix, job.view, job.models, undefined, allTextureViews);
-            } else {
-                engine.render(
-                    projMatrix,
-                    job.view,
-                    job.models,
-                    portalTargets[job.targetIndex].view,
-                    allTextureViews
-                );
+            while (portalTargets.length < totalTextures) {
+                portalTargets.push(engine.createRenderTarget(canvas.width, canvas.height));
             }
-        });
+
+            const allTextureViews = portalTargets.map(t => t.view);
+
+            jobs.forEach((job: any) => {
+                if (job.isMain) {
+                    engine.render(projMatrix, job.view, job.models, undefined, allTextureViews);
+                } else {
+                    engine.render(
+                        projMatrix,
+                        job.view,
+                        job.models,
+                        portalTargets[job.targetIndex].view,
+                        allTextureViews
+                    );
+                }
+            });
+        } else {
+            const dt = (time - lastTime) / 1000;
+            lastTime = time;
+
+            camera.update(dt, input);
+            scene.updateTeleportation(camera);
+
+            const projMatrix = Mat4.perspective(
+                Math.PI / 3,
+                canvas.width / canvas.height,
+                0.1,
+                100
+            );
+
+            const { jobs, totalTextures } = scene.getRenderJobs(camera, 4);
+
+            while (portalTargets.length < totalTextures) {
+                portalTargets.push(engine.createRenderTarget(canvas.width, canvas.height));
+            }
+
+            const allTextureViews = portalTargets.map(t => t.view);
+
+            jobs.forEach((job: any) => {
+                if (job.isMain) {
+                    engine.render(projMatrix, job.view, job.models, undefined, allTextureViews);
+                } else {
+                    engine.render(
+                        projMatrix,
+                        job.view,
+                        job.models,
+                        portalTargets[job.targetIndex].view,
+                        allTextureViews
+                    );
+                }
+            });            
+        }
+        requestAnimationFrame(loop);
     }
     requestAnimationFrame(loop);
-}
-
-requestAnimationFrame(loop);
 }
 
 main().catch(console.error);

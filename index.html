@@ -9,14 +9,16 @@
   </head>
   <body>
     <div id="menu">
-      <img src="banner.png" alt="IKEA Logo" id="ikea-logo" style="width: 300px; height: auto;"><br>
-      Hello! Welcome to my non-euclidean IKEA simulation. <br>
-      <strong>Controls:</strong>WASD to move, mouse to look around, shift to sprint. Click the button below to start the experience.
-      <br>
-      Volume (for an optional shopping soundtrack): <input type="range" min="0" max="100" value="5" class="slider" id="volume-slider"><br>
+      <div id="welcome">
+        <img src="banner.png" alt="IKEA Logo" id="ikea-logo" style="width: 300px; height: auto;"><br>
+        Hello! Welcome to my non-euclidean IKEA simulation. <br>
+        <strong>Controls: </strong>WASD to move, mouse to look around, shift to sprint. Click the button below to start the experience.
+        <br>
+        Volume (for an optional shopping soundtrack): <input type="range" min="0" max="100" value="5" class="slider" id="volume-slider">
+        <br>
+        <button id="start">Start IKEA Experience</button>
+      </div>
 
-      <button id="start">Start IKEA Experience</button>
-      
     </div>
     <canvas id="game-canvas"></canvas>
     <script type="module" src="/src/main.ts"></script>
