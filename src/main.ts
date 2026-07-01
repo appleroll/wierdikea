@@ -43,7 +43,7 @@ async function main() {
             const projMatrix = Mat4.perspective(
                 Math.PI / 3,
                 canvas.width / canvas.height,
-                0.1,
+                0.005,
                 100
             );
 

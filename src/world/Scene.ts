@@ -27,6 +27,7 @@ export class Scene {
         for (const portal of this.portals) {
             const newRoom = portal.checkCrossing(camera, this.activeRoom);
             if (newRoom) {
+                console.log(`Teleported from room ${this.activeRoom} to room ${newRoom}`);
                 this.activeRoom = newRoom;
                 break; // Only allow crossing one portal per frame
             }

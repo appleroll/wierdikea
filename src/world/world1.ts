@@ -5,7 +5,7 @@ import { Scene } from './Scene';
 // import { Tunnel } from '../noneuclideans/Tunnel';
 import { IKEAShell } from '../noneuclideans/Room'; 
 import { Vec3 } from '../math/Vec3';
-import { ikeaColours } from '../colour/ikeaColours';
+import { ikeaColours } from '../colour/IKEAColours';
 import { addShelf } from './Shelving';
 
 // const ROOM_B_Z_OFFSET = 7; 

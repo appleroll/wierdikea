@@ -1,7 +1,7 @@
 import { Vec3 } from '../math/Vec3';
 import { Portal } from './Portal';
 import { Scene } from '../world/Scene';
-import { ikeaColours } from '../colour/ikeaColours';
+import { ikeaColours } from '../colour/IKEAColours';
 
 export interface IKEAShellConfig {
     mainRoom: string;
@@ -184,7 +184,7 @@ export class IKEAShell {
             // ?landmark ?bookmark Add the portal that connects the main room to the first quadrant (Q1)
             // ie. the entrance portal
             const entrancePhysical: Vec3 = [cx - S/2, cy, cz + S];
-            const entranceVirtual: Vec3 = [cx - S/2 + hiddenOffsets[0][0], cy, cz + S + hiddenOffsets[0][2]];
+            const entranceVirtual: Vec3 = [cx - S/2 + hiddenOffsets[0][0] - 0.1, cy, cz + S + hiddenOffsets[0][2]];
             
             scene.addPortal(new Portal(
                 mainRoom, 

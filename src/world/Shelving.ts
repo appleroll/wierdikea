@@ -1,5 +1,5 @@
 import { Scene } from './Scene';
-import {ikeaColours} from '../colour/ikeaColours';
+import {ikeaColours} from '../colour/IKEAColours';
 
 export function addShelf(
     scene: Scene,
