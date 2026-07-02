@@ -42,13 +42,13 @@ export class Portal {
         const axisIdx = this.axis === 'X' ? 0 : 2;
         const crossIdx = this.axis === 'X' ? 2 : 0; 
 
-        console.log({
-            
-            room: currentRoom,
-            prev: camera.prevPos[axisIdx],
-            curr: camera.pos[axisIdx],
-            trigger: currentRoom === this.roomA ? this.triggerA : this.triggerB,
-        });
+        // ?proglandmark For debugging portal
+        // console.log({
+        //     room: currentRoom,
+        //     prev: camera.prevPos[axisIdx],
+        //     curr: camera.pos[axisIdx],
+        //     trigger: currentRoom === this.roomA ? this.triggerA : this.triggerB,
+        // });
 
         if (currentRoom === this.roomA) {
             const crossed = this.dirAtoB === -1 

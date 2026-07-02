@@ -11,6 +11,20 @@ import { addShelf } from './Shelving';
 // const ROOM_B_Z_OFFSET = 7; 
 // const ROOM_C_Z_OFFSET = -10; 
 
+function addShelving(scene: Scene, room: string, startingX: number, endingX: number, y: number, startingZ: number, endingZ: number, shelfWidth: number, shelfHeight: number, shelfDepth: number, xSpacing: number, zSpacing: number) {
+    const minX = Math.min(startingX, endingX);
+    const maxX = Math.max(startingX, endingX);
+
+    const minZ = Math.min(startingZ, endingZ);
+    const maxZ = Math.max(startingZ, endingZ);
+
+    for (let x = minX; x <= maxX; x += shelfWidth + xSpacing) {
+        for (let z = minZ; z <= maxZ; z += shelfDepth + zSpacing) {
+            addShelf(scene, x, y, z, room, shelfWidth, shelfHeight, shelfDepth);
+        }
+    }
+}
+
 export function buildWorld1(init: boolean, existingScene?: Scene): Scene {
     const scene = existingScene || new Scene();
 
@@ -56,7 +70,7 @@ export function buildWorld1(init: boolean, existingScene?: Scene): Scene {
     // });
 
     // ?landmark ?bookmark Outer IKEA Shell
-    const hyperBox = new IKEAShell({
+    const ikeashell = new IKEAShell({
         mainRoom: 'A',
         roomNames: ['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8'],
         centerPos: [0, 6.5, -30],
@@ -88,53 +102,63 @@ export function buildWorld1(init: boolean, existingScene?: Scene): Scene {
     });
 
     if (init) {
-        // Build Room A
         worldGeometry.forEach(b => scene.addBox({ ...b, room: 'A' }));
-
         // ?bookmark ?landmark Storage Self Serve Area No 2 (Q7)
         // ?landmark first row, nearest to yellow entrance
-        addShelf(scene, -87, 1, -153, "Q7", 4, 3, 1);
-        addShelf(scene, -92, 1, -153, "Q7", 4, 3, 1);
-        addShelf(scene, -97, 1, -153, "Q7", 4, 3, 1);
-
-        addShelf(scene, -87, 1, -157, "Q7", 4, 3, 1);
-        addShelf(scene, -92, 1, -157, "Q7", 4, 3, 1);
-        addShelf(scene, -97, 1, -157, "Q7", 4, 3, 1);
+        addShelving(
+            scene,
+            "Q7",
+            -87, -97,      // x range
+            1,             // y
+            -153, -157,    // z range
+            4, 3, 1,       // shelf width, height, depth
+            1, 3           // x spacing, z spacing
+        );
 
         // ?landmark second row, opposite first row in Q7
-        addShelf(scene, -87, 1, -167, "Q7", 4, 3, 1);
-        addShelf(scene, -92, 1, -167, "Q7", 4, 3, 1);
-        addShelf(scene, -97, 1, -167, "Q7", 4, 3, 1);
+        addShelving(
+            scene,
+            "Q7",
+            -87, -97,
+            1,
+            -167, -171,
+            4, 3, 1,
+            1, 3
+        );
 
-        addShelf(scene, -87, 1, -171, "Q7", 4, 3, 1);
-        addShelf(scene, -92, 1, -171, "Q7", 4, 3, 1);
-        addShelf(scene, -97, 1, -171, "Q7", 4, 3, 1);
-
-        addShelf(scene, -82, 1, -171, "Q7", 4, 3, 1);
-        addShelf(scene, -77, 1, -171, "Q7", 4, 3, 1);
-
-        addShelf(scene, -82, 1, -167, "Q7", 4, 3, 1);
-        addShelf(scene, -77, 1, -167, "Q7", 4, 3, 1);  
+        // Extra two shelves on the left
+        addShelving(
+            scene,
+            "Q7",
+            -82, -77,
+            1,
+            -167, -171,
+            4, 3, 1,
+            1, 3
+        );
 
         // ?bookmark ?landmark Storage Self Serve Area No 1 (Q6)
         // ?landmark first row, nearest to yellow entrance
-        addShelf(scene, -102, 1, -147, "Q6", 4, 3, 1);
-        addShelf(scene, -107, 1, -147, "Q6", 4, 3, 1);
-        addShelf(scene, -112, 1, -147, "Q6", 4, 3, 1);
-
-        addShelf(scene, -102, 1, -151, "Q6", 4, 3, 1);
-        addShelf(scene, -107, 1, -151, "Q6", 4, 3, 1);
-        addShelf(scene, -112, 1, -151, "Q6", 4, 3, 1);
+        addShelving(
+            scene,
+            "Q6",
+            -102, -112,
+            1,
+            -147, -151,
+            4, 3, 1,
+            1, 3
+        );
 
         // ?landmark second row, opposite first row in Q6
-        addShelf(scene, -102, 1, -133, "Q6", 4, 3, 1);
-        addShelf(scene, -107, 1, -133, "Q6", 4, 3, 1);
-        addShelf(scene, -112, 1, -133, "Q6", 4, 3, 1);
-
-        addShelf(scene, -102, 1, -137, "Q6", 4, 3, 1);
-        addShelf(scene, -107, 1, -137, "Q6", 4, 3, 1);
-        addShelf(scene, -112, 1, -137, "Q6", 4, 3, 1);
-
+        addShelving(
+            scene,
+            "Q6",
+            -102, -112,
+            1,
+            -133, -137,
+            4, 3, 1,
+            1, 3
+        );
 
         // // 2. Build Room B (Compresses space)
         // worldGeometry.forEach(b => {
@@ -161,7 +185,7 @@ export function buildWorld1(init: boolean, existingScene?: Scene): Scene {
 
     // secretTunnel.addToScene(scene, init);
     // secretTunnel2.addToScene(scene, init);
-    hyperBox.addToScene(scene, init); 
+    ikeashell.addToScene(scene, init); 
     
     return scene;
 }
